@@ -1,0 +1,1972 @@
+{
+  "name": "Assignment 1",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "listConnections",
+        "execution": {},
+        "limit": 200
+      },
+      "type": "n8n-nodes-browserflow.browserflow",
+      "typeVersion": 1,
+      "position": [
+        336,
+        240
+      ],
+      "id": "f0832d29-228e-4a0d-8b7d-841cc0565c4c",
+      "name": "List your linkedin connections",
+      "credentials": {
+        "browserflowApi": {
+          "id": "q85qfDVE3OZqt66F",
+          "name": "Browserflow account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        576,
+        240
+      ],
+      "id": "c34bca6a-8aa9-4f6e-b2b8-7738a8db80df",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9714a308-2977-43c0-83dd-ed6d50b6bc38",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "ea571902-d40b-42ff-8638-52100820342d",
+              "name": "linkedin_url",
+              "value": "={{ $json.linkedin_url }}",
+              "type": "string"
+            },
+            {
+              "id": "4a403092-2aa6-450c-b41c-11bc31c97b5a",
+              "name": "tagline",
+              "value": "={{ $json.tagline }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        240
+      ],
+      "id": "a9f2d606-44c9-4fa8-a733-e315a08ef3fe",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2f95e9ee-3bd0-4142-88ec-674fcf80e269",
+              "leftValue": "={{ $json.tagline }}",
+              "rightValue": "Product",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "415d000c-ef06-47f9-99a7-62b698bd4c00",
+              "leftValue": "={{ $json.tagline }}",
+              "rightValue": "hiring",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "a9412b8e-c81e-4133-a313-0d1f38ad6782",
+              "leftValue": "={{ $json.tagline }}",
+              "rightValue": "PM",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "6f865d6d-feff-422f-9df6-c267ed51e82c",
+              "leftValue": "={{ $json.tagline }}",
+              "rightValue": "Director",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        240
+      ],
+      "id": "5e4e4594-3181-4202-aa65-ea93341e6d66",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "operation": "clearDeduplicationHistory",
+        "options": {
+          "scope": "workflow"
+        }
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        928,
+        240
+      ],
+      "id": "d3fe4e92-3df3-4b18-b6a1-4d53bedec5c6",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert intelligent email writer with full knowledge on Product management"
+            },
+            {
+              "content": "=Help me write an LinkedIn message to  {{ $json.name }} in less than 500 characters.\n\nGuidelines:\n1. Your tone of voice should be casual bar conversation. No Fancy bluff language.\n2. Do not just repeate the data from linkedin profile verbatim. paraphrase so they think human wrote it.\n3. Make sure the subject line is not capitalized.\n4. Extract something {unique} from their profile. \nHere is the sample message:\n\n\"Hey {{ $json.name }},\nThanks for connecting. I'm Mrudu, Product manager with 4 years of experience. I know you are doing {unique} thing and I've been following {relatedThing} for a while so I wanted to chat more of your experience. Would you be open to a quick coffee chat sometime?\nBest,\nMrudu\"\n\nrepond it in JSON using this format:\n{\"unique\":\"\",\"relatedThing\":\"\",\"messageDraft\":\"\",\"linkedin_url\":\"\"}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "backgroundMode": {
+            "values": {
+              "enabled": "={{ true }}"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        336
+      ],
+      "id": "f5c6bf34-1502-4732-adf9-a402124b9bd6",
+      "name": "Message a model",
+      "executeOnce": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "Pdvz84ILRaTXnHc9",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        240
+      ],
+      "id": "f6449f9c-7eee-486d-a9ed-77b52ed3b9d7",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "22d7bfe4-1dea-4a3a-b2c0-e0ce1e69afbd",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "6db4530d-841a-4d98-ae55-054d21f0e614",
+              "name": "linkedin_url",
+              "value": "={{ $json.linkedin_url }}",
+              "type": "string"
+            },
+            {
+              "id": "c51b3933-9a48-47d3-82b4-6527448c8015",
+              "name": "tagline",
+              "value": "={{ $json.tagline }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1920,
+        144
+      ],
+      "id": "0135a781-5147-4839-9750-c5a77ae69839",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2144,
+        240
+      ],
+      "id": "b302d539-a9c4-4b8a-8908-367531c3aca9",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output[0].content[0].text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        336
+      ],
+      "id": "f2621a45-8cc9-4fa5-be48-386700c3a94c",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f64e7ce1-c97f-4d4f-8f00-461358724691",
+              "name": "unique",
+              "value": "={{ JSON.parse($json[\"output[0].content[0].text\"]).unique }}",
+              "type": "string"
+            },
+            {
+              "id": "2114d321-4ba7-483c-9bd0-ebfe98c255ac",
+              "name": "relatedThing",
+              "value": "={{ JSON.parse($json[\"output[0].content[0].text\"]).relatedThing }}",
+              "type": "string"
+            },
+            {
+              "id": "d3dae7fc-70a8-41f4-88a8-d9aed88043ef",
+              "name": "messageDraft",
+              "value": "={{ JSON.parse($json[\"output[0].content[0].text\"]).messageDraft }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1920,
+        336
+      ],
+      "id": "69ca0169-c5ce-41e5-8c71-e7a2d7a15687",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "lwaUic5cbA9EIr9a",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Messaging Agent",
+          "cachedResultUrl": "/projects/yEIc5xhTAOZhuQjW/datatables/lwaUic5cbA9EIr9a"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "linkedin_url": "={{ $json.linkedin_url }}",
+            "tageline": "={{ $json.tagline }}",
+            "unique": "={{ $json.unique }}",
+            "relatedThing": "={{ $json.relatedThing }}",
+            "messageDraft": "={{ $json.messageDraft }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "linkedin_url",
+              "displayName": "linkedin_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "tageline",
+              "displayName": "tageline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "unique",
+              "displayName": "unique",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "relatedThing",
+              "displayName": "relatedThing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "messageDraft",
+              "displayName": "messageDraft",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        240
+      ],
+      "id": "ac6672c6-5b64-4a5c-be0c-66d523c01017",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "content": "# LinkedIn Cold Message writer\n### Name: Mrudu Lahari\n\n\nThis is a workflow I have developed to help me write a cold message as an ice-breaker with the LinkedIn connections I make.\n## Problem statement:\nOften times, We connect with a lot of people every week to talk and learn from their journey, or to get some guidance or just to have a coffee chat!\nUnfortunately, we get lost in 100's of connections we make every week and end up not actually breaking the ice with even 10% of people. \n\n## Solution:\nSo here is a Automation workflow I have created to assist me get insights on what is Unique in their profile, what is that 1 thing that is common between both of us and finally, what is a perfect message to reach out to them\n\n## Workflow logic:\n1. Use BrowserFlow API to get the list of connects of my Profile. (Note: Enabling recently added will limit to latest connections you have made).\nFurther, I usually make around 200 connections a month so, I have given a upper limit of 200 to get the list of new connections only.\n2. Splitout: Used to convert array of JSON data into structured data of fields as required.\n3. Performed data cleaning: Removed duplicates, and unnecessary fields.\n4. Filter: occasionally, I end up making LinkedIn connections with people who are not from my domain. As a Product manager, I want to send a cold message to those who are Product managers or Hiring managers. \n5. Open AI: Extracted the profile of each connection and prompted openAI to generate the Unique, and related experience me and my connect mutually have.\n6. Perform data cleaning: Format the JSON array, merge the fields from OpenAI and connect with other fields extracted from BrowserFlow\n7. Add to database: Created a Database with n8n and added those updated fields and contacts!\n\n### Hurray!, The agent is ready!  🥳\n",
+        "height": 624,
+        "width": 1488
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -512
+      ],
+      "id": "6b8d9f55-112f-4e83-a5d1-9c86f515d2cc",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "List your linkedin connections": [
+      {
+        "json": {
+          "sessionId": "b79d859c9f427c5b90a74376f4d3c67d",
+          "success": true,
+          "data": [
+            {
+              "name": "Krishnaveni T",
+              "linkedin_url": "https://www.linkedin.com/in/krishnavenid/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQGkCkgGr28OEA/profile-framedphoto-shrink_100_100/B56ZqOGOZjHQAk-/0/1763320588126?e=1764104400&v=beta&t=kptrufuVwngidYxkrExsUQB7Ks6d-mlc-mK74_O3fC8",
+              "tagline": "Strategic AI PM value 0->1 ValieSenior IT Leader | 18+Years in Product Delivery | Mentor & Self-Starter | Financial,Retail,Manufacturing, Healthcare, Retail | Agentic AI PM I MBA, POPMI,  LPMI, CSMI, Safe 6.0 Certified",
+              "connected_at": "Connected on November 16, 2025"
+            },
+            {
+              "name": "Neel Patel",
+              "linkedin_url": "https://www.linkedin.com/in/neelthecaptivatincoder/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQGXW0U7XhrOLA/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1660002772504?e=1764104400&v=beta&t=oG02o-C8mxG0a34wHMMbembOJrP72Uv25vVYDFtAAps",
+              "tagline": "M.S. Computer Science | Software Developer | Full-Stack Engineer | Cloud Computing | Data Science | AI/ML Enthusiast | Web & Mobile Applications",
+              "connected_at": "Connected on November 15, 2025"
+            },
+            {
+              "name": "Harsha Patil",
+              "linkedin_url": "https://www.linkedin.com/in/harshapatil-pd/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHjH19qlVEc7g/profile-displayphoto-scale_100_100/B56Zf14WdYHUAo-/0/1752176880230?e=1764806400&v=beta&t=qQ8uyriZ3a3xxntNRfDXEz-7L09-fTAIrmux17_BPvA",
+              "tagline": "Product Leader | Generative / Agentic AI | Driving Scalable SaaS Products with Agile Excellence | Enabling Product-Led Growth",
+              "connected_at": "Connected on November 14, 2025"
+            },
+            {
+              "name": "Lakshmi Saligram",
+              "linkedin_url": "https://www.linkedin.com/in/lakshmisaligram/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQGB74_MHhgbog/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1606160709756?e=1764806400&v=beta&t=czQ79NxyoyHeiocQhanH4rKXAiqlzgpoGgW8TnI4yhw",
+              "tagline": "Product @ Amazon",
+              "connected_at": "Connected on November 13, 2025"
+            },
+            {
+              "name": "Kavitha Patnaik",
+              "linkedin_url": "https://www.linkedin.com/in/kavithapatnaik/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQGsyKvj13wBRQ/profile-framedphoto-shrink_100_100/B4EZfo0XzfHYAk-/0/1751957732794?e=1764104400&v=beta&t=mG-BRzibNQAvDSmbVURxMtdvHAxNiwBwYABQKVVimYk",
+              "tagline": "Product Owner, Senior Business Analyst, Product Manager",
+              "connected_at": "Connected on November 13, 2025"
+            },
+            {
+              "name": "Chaitanya Bejjanki",
+              "linkedin_url": "https://www.linkedin.com/in/chaitanya-bejjanki-55ba91171/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQE4-2g2ReClDw/profile-framedphoto-shrink_100_100/B56ZlY7NF4J0Ak-/0/1758133539457?e=1764104400&v=beta&t=kxEeLP8gXqj6LbQrBrXFaR6HRRc6UOBCzvF1GRQhha0",
+              "tagline": "Software & Data Engineer| React.js | Redux | JavaScript (ES6+) | Node.js| Express.js| PySpark | Data Visualization | Python | SQL | Power BI 📈  | EX-TCS | Actively Seeking Full-Time Role",
+              "connected_at": "Connected on November 13, 2025"
+            },
+            {
+              "name": "Soniya Bajaaj",
+              "linkedin_url": "https://www.linkedin.com/in/soniyabajaaj/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQFOrgJLblwiyg/profile-framedphoto-shrink_100_100/B4EZflxya5GcAk-/0/1751906723839?e=1764104400&v=beta&t=zv0PEFX3QpHMpdGWgxpveuej2RK1r01bQ_sWWAhuc68",
+              "tagline": "Senior Product Manager | Certified AI Product Manager | Driving the Future of Ethical & Scalable AI Products",
+              "connected_at": "Connected on November 13, 2025"
+            },
+            {
+              "name": "Felix Biju",
+              "linkedin_url": "https://www.linkedin.com/in/felixbiju/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQENneMQzKBkhg/profile-displayphoto-scale_100_100/B56ZlL7EG0HkAc-/0/1757915409256?e=1764806400&v=beta&t=CENGZ0HaEnZx3aGPzQv0NHE-8sxkpDetxDjNkewJKiw",
+              "tagline": "Director of Product Management @ ON24 (NYSE:ONTF) | AI PM | Intelligent Engagement + AI | Data-Driven SaaS Builder | Certified PM | Full-Stack PM | LLMs | AI Ethics & Product Strategy",
+              "connected_at": "Connected on November 13, 2025"
+            },
+            {
+              "name": "Jatin Mahajan",
+              "linkedin_url": "https://www.linkedin.com/in/jatin-m-b880053b/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQGXW0U7XhrOLA/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1660002772504?e=1764104400&v=beta&t=oG02o-C8mxG0a34wHMMbembOJrP72Uv25vVYDFtAAps",
+              "tagline": "Business Analyst | Financial Services | Enterprise Systems, Digital Banking, SWIFT & Payments Modernization",
+              "connected_at": "Connected on November 13, 2025"
+            },
+            {
+              "name": "Anusha Yatirajula",
+              "linkedin_url": "https://www.linkedin.com/in/anusha-yatirajula-40083535/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEBOAPz2k67Lw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1682325737139?e=1764806400&v=beta&t=KW9MQan3Lnu9I60C4z3nv-8fsA283rPGV5xysje-olE",
+              "tagline": "Aspiring Product Manager | M.S. Software Engineering | AI/LLM + Analytics | Built FamilyBank | 7+ yrs QA/System Engg",
+              "connected_at": "Connected on November 13, 2025"
+            },
+            {
+              "name": "Hitha Magadi Vijayanand",
+              "linkedin_url": "https://www.linkedin.com/in/hitha-magadi-vijayanand-68143b1b5/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQF1sodXkyzqQA/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1728431503149?e=1764104400&v=beta&t=lv7sgWFDwgXd6QdWKzRAzVeVbXDY6OLT6mX8bQ32LKk",
+              "tagline": "GHC ’25  | Seeking Full Time Opportunities and \nOpen to Spring 2026 Internships | Master’s in CS @Texas A&M | Former Software Engineer @JP Morgan | Java | Python | AWS | AI & ML Enthusiast",
+              "connected_at": "Connected on November 12, 2025"
+            },
+            {
+              "name": "Laxmi Prashanthi Muthyala",
+              "linkedin_url": "https://www.linkedin.com/in/laxmi-prashanthi-muthyala/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C4D03AQHAoILXzvqGng/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1643820688076?e=1764806400&v=beta&t=LEq-G87UoUQS_Z9_WmIM8wF0bLnuLVMObRudIMi9WuI",
+              "tagline": "Director of Technical Product & Program Management | AI/ML | Cloud & Data Platforms |",
+              "connected_at": "Connected on November 12, 2025"
+            },
+            {
+              "name": "Rutika Sakore",
+              "linkedin_url": "https://www.linkedin.com/in/rutikasakore/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQEwQ-t1I-HLEA/profile-framedphoto-shrink_100_100/B4DZbF5V7BGUAk-/0/1747076866106?e=1764104400&v=beta&t=q6GM8SudNJkP-bYrVbuDRDiKNRwlopzPcWfHFOQLazU",
+              "tagline": "Product Manager Intern @ Komatsu | Product Strategy • AI • Data Analytics • Cloud | GHC Scholar ’25 | MSMIS ’25 @ University of Arizona | Open to Full-Time Product Management (PM) Roles",
+              "connected_at": "Connected on November 12, 2025"
+            },
+            {
+              "name": "Rob Wilson",
+              "linkedin_url": "https://www.linkedin.com/in/robertdeverswilson/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQG1BROev_UkzQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1517744834660?e=1764806400&v=beta&t=gGbtxRHg0TZ8xUqyI3GmTNxeBVyrucTCvWND0ORyHII",
+              "tagline": "Senior Manager of Product Management at Amazon Web Services (AWS)",
+              "connected_at": "Connected on November 12, 2025"
+            },
+            {
+              "name": "Shaloo Garg",
+              "linkedin_url": "https://www.linkedin.com/in/shaloo-garg/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFrVEmIRVTqPQ/profile-displayphoto-scale_100_100/B56ZkcCAY1H8Ac-/0/1757111912457?e=1764806400&v=beta&t=K3rO0sYiXlEedBImV4Pr33m9bhaZiRK-dNOB-1-6InA",
+              "tagline": "MD, Startups, Microsoft |  Board Member | Investor | Champion for Social Impact & Female Founders",
+              "connected_at": "Connected on November 12, 2025"
+            },
+            {
+              "name": "Josh Wu",
+              "linkedin_url": "https://www.linkedin.com/in/xjoshwu/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C4E03AQGHPVqY4NE4SA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1545093921284?e=1764806400&v=beta&t=SYVHuTbtI7-QxGxfPm7Fcx4y1REGCU1wXp0AdqCkya4",
+              "tagline": "Co-founder, Product @ Rally Design",
+              "connected_at": "Connected on November 10, 2025"
+            },
+            {
+              "name": "Suhas Pirankar",
+              "linkedin_url": "https://www.linkedin.com/in/suhaspirankar/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQGybr6npE9zPg/profile-displayphoto-shrink_100_100/B4DZXjSTvZHwAU-/0/1743274984039?e=1764806400&v=beta&t=UNElw-vMYSzPec5jm78vw8ueBAGDSXtzbuPf7vf_QWQ",
+              "tagline": "Apple | PM | Generative & Personalization AI",
+              "connected_at": "Connected on November 10, 2025"
+            },
+            {
+              "name": "Hema Krishna",
+              "linkedin_url": "https://www.linkedin.com/in/hema-krishna-602993192/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQFYF2PI_M_CtA/profile-framedphoto-shrink_100_100/B56Zbf__JHH4Ak-/0/1747514815331?e=1764104400&v=beta&t=xVgjdKB96mNezLh7V24XRVVD-mv6OTFSqhqoy6e8YGQ",
+              "tagline": "Business Analytics Graduate Student | Data-Driven Decision Making | SQL & Advanced Databases | Machine Learning & Big Data | Experience in Data Visualization & Insights | Certified in Security Operations",
+              "connected_at": "Connected on November 9, 2025"
+            },
+            {
+              "name": "Priya Singh",
+              "linkedin_url": "https://www.linkedin.com/in/priya-singh1093/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5103AQF8MPYN8HPEgw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1566781676690?e=1764806400&v=beta&t=k9gHis9zVK7gAv2icCILgTH8hOlgolzJI3pOY_WO8vc",
+              "tagline": "Senior Product Manager at Microsoft",
+              "connected_at": "Connected on November 9, 2025"
+            },
+            {
+              "name": "Lizzie(Jieying) Zhu",
+              "linkedin_url": "https://www.linkedin.com/in/lizziezhu/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQEiPHg-BXFP_w/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1695697759214?e=1764104400&v=beta&t=b31BWzFVudPYTwWmLzE3See3JkKhpfmoQTn7g-lFguY",
+              "tagline": "Master of Science Buisness Analytics Student / Sloving business problem using quantitative analysis / GHC Student Scholar ‘23 participants ’25 / Research paper in CIS & Healthcare in progess abstract accepted by AMCIS",
+              "connected_at": "Connected on November 8, 2025"
+            },
+            {
+              "name": "Yuehan Lin",
+              "linkedin_url": "https://www.linkedin.com/in/yuehan-lin-918321179/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C4E03AQG75UkUSQZMlg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1609723837169?e=1764806400&v=beta&t=M0z4SlzDTrS92uhzhd5LwXLQ2IzPdNVIKSDg8vux7vI",
+              "tagline": "Software Engineer",
+              "connected_at": "Connected on November 8, 2025"
+            },
+            {
+              "name": "Aakar Kale",
+              "linkedin_url": "https://www.linkedin.com/in/aakarkale/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQES0o8iQCXgVw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1572651679421?e=1764806400&v=beta&t=nhZRk5KAKuGHIRmhidQ_3nWSRlJ8a8oR1MoPdjQQqj0",
+              "tagline": "Growth Product Manager | ex-Founder | Consumer, B2B & B2B2C | M&A | Healthcare | Fintech | 0→1→N",
+              "connected_at": "Connected on November 8, 2025"
+            },
+            {
+              "name": "Nishtha Chaudhary",
+              "linkedin_url": "https://www.linkedin.com/in/nishthachaudhary59/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQH_lKsu_gOinw/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1737080433360?e=1764104400&v=beta&t=94aYHgoSlGAhMc0JqPojeQTgtQTwpNcJoE4IHnpWEvc",
+              "tagline": "GHC 2025 | MSCS @ASU | Ex-SWE @Oracle | B.Tech ICT @DAU",
+              "connected_at": "Connected on November 8, 2025"
+            },
+            {
+              "name": "Jaiden Price",
+              "linkedin_url": "https://www.linkedin.com/in/jaidenprice/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQHGHxIp3FTFTA/profile-displayphoto-scale_100_100/B4EZpH_t5jGYAg-/0/1762144477299?e=1764806400&v=beta&t=kFWGZAhmj6r2nvt9L31DL7Blqid8YIL4QopZKbYnfZg",
+              "tagline": "Adobe | Grace Hopper Speaker ",
+              "connected_at": "Connected on November 8, 2025"
+            },
+            {
+              "name": "Sarah Frisanco (Blum)",
+              "linkedin_url": "https://www.linkedin.com/in/sarahfrisanco/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEfOXcT9FDEnA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1662677624531?e=1764806400&v=beta&t=wizVhvv-HvTeO9ebbyKfIi3IhDrCl3GYKY1NzIpN3Tc",
+              "tagline": "SASE & SSE Solutions Engineer",
+              "connected_at": "Connected on November 7, 2025"
+            },
+            {
+              "name": "Camila Garcia-Novelli",
+              "linkedin_url": "https://www.linkedin.com/in/camilagn/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQFZ6fZLlAv02w/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1718754389857?e=1764806400&v=beta&t=Pr_bv9Zx2vz_zeyAlxl3s3J1qp4lRqSP2XUjWRK9MPA",
+              "tagline": "Software Engineer @ IMC",
+              "connected_at": "Connected on November 7, 2025"
+            },
+            {
+              "name": "Rishma Manna",
+              "linkedin_url": "https://www.linkedin.com/in/rishma-manna/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQGYFMAItcaNGg/profile-framedphoto-shrink_100_100/B4DZm2qoycHYAk-/0/1759706254790?e=1764104400&v=beta&t=TNK8ud0xlU24UcHdnstj7oW18b9321O1c-1bjV3Zrag",
+              "tagline": "GHC25 | Seeking Full-time SWE roles | Ex-Barclays | MSCS @ University of Florida | SWE Intern - Voloridge | Stanford TreeHacks ’25 | Software Engineering | Full Stack Web Development | AI/ML",
+              "connected_at": "Connected on November 7, 2025"
+            },
+            {
+              "name": "Tiffany T. Nguyen",
+              "linkedin_url": "https://www.linkedin.com/in/tiffanyttnnguyen/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQE3Q8Tc_ZOi2Q/profile-displayphoto-scale_100_100/B4EZl9dTmRKkAc-/0/1758746459663?e=1764806400&v=beta&t=wobv1s1KAgRqpiGE4mO6ckE1kYvK2kPRC_e8aUgh_4w",
+              "tagline": "Carnegie Mellon Master’s Student (Tepper | Business | Data Analytics)",
+              "connected_at": "Connected on November 7, 2025"
+            },
+            {
+              "name": "Iris Su",
+              "linkedin_url": "https://www.linkedin.com/in/iris-anna-su/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQGU7u8KlaJBOw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1689521574717?e=1764806400&v=beta&t=a4FlrzcugSKhNYGYqR4xAccs445MTytgiRLkP4eWh8c",
+              "tagline": "PM at Microsoft",
+              "connected_at": "Connected on November 7, 2025"
+            },
+            {
+              "name": "Ann Rich",
+              "linkedin_url": "https://www.linkedin.com/in/ann-rich/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C4E03AQGmKwIbEQya0w/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1527596103064?e=1764806400&v=beta&t=-BApUFiQjWsFTSRTObwwhoXhuGhLjhFsNSFJ7Pae650",
+              "tagline": "Digital Technical Product Manager",
+              "connected_at": "Connected on November 7, 2025"
+            },
+            {
+              "name": "Grace Hopper Leaderboard",
+              "linkedin_url": "https://www.linkedin.com/in/grace-hopper-leaderboard/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQH4MBg_KIyTDg/profile-displayphoto-scale_100_100/B4EZnJwtyIJgAc-/0/1760026616684?e=1764806400&v=beta&t=InOf7I_BVk1F7-4Gz_SFlNuHgYu3_84p0DJ1MvlAvjU",
+              "tagline": "Zip, a puzzle by LinkedIn Leaderboard",
+              "connected_at": "Connected on November 7, 2025"
+            },
+            {
+              "name": "Késsia Nepomuceno",
+              "linkedin_url": "https://www.linkedin.com/in/kessianepomuceno/en/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQHc-sft5G0jWg/profile-displayphoto-shrink_100_100/B4DZVsrCsHHkAU-/0/1741284977792?e=1764806400&v=beta&t=mhOnfnRm0Tat4e2jiOuNqd2wPBUIRqD1AYS3FY0eRKM",
+              "tagline": "",
+              "connected_at": "Connected on November 7, 2025"
+            },
+            {
+              "name": "Rebecca Dorn",
+              "linkedin_url": "https://www.linkedin.com/in/rebeccaldorn/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQE-joI8ZFvv7A/profile-displayphoto-scale_100_100/B56ZmCFW7fJwAc-/0/1758824068997?e=1764806400&v=beta&t=jfoON3uDTT2YDQEjggaGIpXdZT6V6e4x6ZsaoYsWCJU",
+              "tagline": "Diversity Inclusion and Belonging at LinkedIn",
+              "connected_at": "Connected on November 6, 2025"
+            },
+            {
+              "name": "Misha Muchhala",
+              "linkedin_url": "https://www.linkedin.com/in/mishamuchhala/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C4E03AQHDSxZdzj5pVQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1628475782833?e=1764806400&v=beta&t=E1uQemEiEsKKClHphSEFS6XBnjRCOOSY_TQHNH455nc",
+              "tagline": "Product Manager @ Microsoft",
+              "connected_at": "Connected on November 6, 2025"
+            },
+            {
+              "name": "Harshitha Jampani",
+              "linkedin_url": "https://www.linkedin.com/in/jampanisri7/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHZLCWwFVy55Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1722014411809?e=1764806400&v=beta&t=ujOPxNqiDl4yqdBC7Q3qJH_mCr0uQwyGHtuqJrZllRc",
+              "tagline": "Software Engineer @ Microsoft",
+              "connected_at": "Connected on November 6, 2025"
+            },
+            {
+              "name": "Sneha Yarasani",
+              "linkedin_url": "https://www.linkedin.com/in/sneha-yarasani/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQEHrgwBzch_Gw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1683574580784?e=1764806400&v=beta&t=T36f-PbNPS_a6Y0EL8NnlCO3gRlgU3q5V8mXa0ULchQ",
+              "tagline": "MS in Human Computer Interaction I Bridging Human Connection, Tech, and Art",
+              "connected_at": "Connected on November 6, 2025"
+            },
+            {
+              "name": "Akhila Sulgante",
+              "linkedin_url": "https://www.linkedin.com/in/akhila-sulgante/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGpcEjVTkR4ZA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1702880727470?e=1764806400&v=beta&t=uATV9CGPmJbYvWp3_BmJCQMaD67GWGmxawPTV7imEik",
+              "tagline": "GHC-2025 | Product-Led Thinker | Bridging Tech, CX, UX & Strategy",
+              "connected_at": "Connected on November 6, 2025"
+            },
+            {
+              "name": "Anika Sharma",
+              "linkedin_url": "https://www.linkedin.com/in/anika-sharma26/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQGRmX6esZYnBQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1700434230822?e=1764806400&v=beta&t=sjdP7IVt_VJxe56FOclXgMsJn3J8xR9xNXXrDS52io0",
+              "tagline": "CS+Stats at UNC | NLP researcher and marine conservationist | UNC CS student ambassador",
+              "connected_at": "Connected on November 6, 2025"
+            },
+            {
+              "name": "Jenn Bou-Sliman",
+              "linkedin_url": "https://www.linkedin.com/in/jenn-bou-sliman-3273594a/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQG3HOB8MvfsTQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1547003985709?e=1764806400&v=beta&t=ZFx6ryREj9UjgvNyt3dtZS8R25V3JZVRsp_6yGKwm1w",
+              "tagline": "Enabling a better healthcare experience at Zocdoc",
+              "connected_at": "Connected on November 6, 2025"
+            },
+            {
+              "name": "Nirupma .",
+              "linkedin_url": "https://www.linkedin.com/in/nirupma17/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQHaYWvWaSBo0w/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1606260696306?e=1764806400&v=beta&t=WqnRKeHdOw53sDxy8VsuPhR8AjoYOm9eQfIgfPwUFEU",
+              "tagline": "Technical Product Manager | Forté Fellow",
+              "connected_at": "Connected on November 6, 2025"
+            },
+            {
+              "name": "Michael Darragh",
+              "linkedin_url": "https://www.linkedin.com/in/michael-darragh-43718417a/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQGLow28hoJm9Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1702488043852?e=1764806400&v=beta&t=0w5NGxkuw4Exh6PHLkWxOxKmvdE16ZES5DCcZazyxCg",
+              "tagline": "Demand Generation | B2B | GTM Strategy | Senior Enterprise Sales Representative",
+              "connected_at": "Connected on November 5, 2025"
+            },
+            {
+              "name": "Snigdha Shahi",
+              "linkedin_url": "https://www.linkedin.com/in/snigdha-shahi/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQE8mRZe2gbc0Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1694983409637?e=1764806400&v=beta&t=xuBRoLIZLqiH6Rdb1cz7SDrKLdwjJ9Qf1F_uOvD8acs",
+              "tagline": "AI PM @ AWS FinTech | Social Innovation and Impact | Harvard Kennedy School",
+              "connected_at": "Connected on November 5, 2025"
+            },
+            {
+              "name": "Libby Birenboim",
+              "linkedin_url": "https://www.linkedin.com/in/libby-birenboim/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHyI3ce3NICxA/profile-displayphoto-shrink_100_100/B56ZlUr7V7JwAU-/0/1758062426166?e=1764806400&v=beta&t=R-95ozS8AmFLLH2uJpBYyndXppB0JC1ZPu77qBvCRbA",
+              "tagline": "Product Manager @Microsoft • PBK • RTC• Topmate Mentor 👉 topmate.io/libby_birenboim",
+              "connected_at": "Connected on November 4, 2025"
+            },
+            {
+              "name": "Gursimran Singh",
+              "linkedin_url": "https://www.linkedin.com/in/pingthesingh/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQF3nzJMp4REQg/profile-displayphoto-scale_100_100/B56Zm.Py0DKMAc-/0/1759833436320?e=1764806400&v=beta&t=1DdP6YQGPQODHPRsChyNXCerojqljUuTomRjrjtuCns",
+              "tagline": "Product Manager @ Microsoft Azure | Georgia Tech CS",
+              "connected_at": "Connected on November 4, 2025"
+            },
+            {
+              "name": "Mariah W.",
+              "linkedin_url": "https://www.linkedin.com/in/mariah-w-28b331186/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGcIa9q63kqhQ/profile-displayphoto-scale_100_100/B56ZfmNDOiH8Ac-/0/1751913870924?e=1764806400&v=beta&t=In48A6a7qssK4qVnRMzWPkI_Kr1wPEdxMEn8vRDs65s",
+              "tagline": "RTC Fellow | MLT27 | Greater Chicago Area | Creative Director | Marketing & Media",
+              "connected_at": "Connected on November 4, 2025"
+            },
+            {
+              "name": "Nicole Kuntjoro",
+              "linkedin_url": "https://www.linkedin.com/in/kuntjoronicole/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHUkVujPu5flA/profile-displayphoto-shrink_100_100/B56ZO4PMl9GsAU-/0/1733962812136?e=1764806400&v=beta&t=QjWrNyK2jbyenyv1LmyKK_NSVFODkmyfz8bkBAIsZY4",
+              "tagline": "Product Manager 2 @ Microsoft | E2E Product Design and User Experiences",
+              "connected_at": "Connected on November 4, 2025"
+            },
+            {
+              "name": "Teodora Sutilovic",
+              "linkedin_url": "https://www.linkedin.com/in/teodora-sutilovic/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQHHFhJzOPZwsA/profile-displayphoto-shrink_100_100/B4EZbxIeudHAAU-/0/1747802255220?e=1764806400&v=beta&t=IOFXtNi7jb_TRu1uY_IgfNNbPmP5kidjmziy1ts17k8",
+              "tagline": "Product Manager @ Microsoft Azure | CS @ Columbia Engineering",
+              "connected_at": "Connected on November 4, 2025"
+            },
+            {
+              "name": "Dhanashri Phadke",
+              "linkedin_url": "https://www.linkedin.com/in/dhanashriphadke/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5103AQEn_h30U-hTHg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1516297552274?e=1764806400&v=beta&t=lsdAKswD4VBMkJOf7NMuQ7pyPAa-vzlgnVY-ODrCFsc",
+              "tagline": "#GHC25 Speaker | AI Leader | GenAI • Agentic AI • RAG • Multimodal LLMs • MLOps • Cloud Architecture",
+              "connected_at": "Connected on October 31, 2025"
+            },
+            {
+              "name": "Altaf Khan",
+              "linkedin_url": "https://www.linkedin.com/in/altafkhan78/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQGxld-Qz27PVA/profile-displayphoto-shrink_100_100/B4EZdTAwWMHgAY-/0/1749444396768?e=1764806400&v=beta&t=6GGeLCV4QeEogV6CnyAFGaOs85NW1z_0EHj28AwNZyc",
+              "tagline": "Data Engineer | Ex-Bank of America, Credit Acceptance | Spark | Airflow | Snowflake | AWS | ETL | Python | SQL | Designing scalable, reliable data pipelines to power analytics| Databricks Certified| LLM & GenAI Pipelines",
+              "connected_at": "Connected on October 31, 2025"
+            },
+            {
+              "name": "Prerna Palawat",
+              "linkedin_url": "https://www.linkedin.com/in/prernapalawat/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFpTnGk34KmRg/profile-displayphoto-scale_100_100/B56Zo2.jUQHYAk-/0/1761858959303?e=1764806400&v=beta&t=djVtSQYYlhqPOXaxBRhyxUJqYNCRePJWQ0QNOhTIHGY",
+              "tagline": "MBA’27 Candidate at Fordham GSB | Dean’s Scholar | Strategy Lead & Co-Founder | Architect | ASA Consultants | Godrej ",
+              "connected_at": "Connected on October 31, 2025"
+            },
+            {
+              "name": "Ridi Tasmiah",
+              "linkedin_url": "https://www.linkedin.com/in/riditasmiah/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQFQQ_jfNh-7Jg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1658981696118?e=1764806400&v=beta&t=kIQERpMeD7wQu7pxsPAt0C4xCK49eYmBvsXKyU-MgyA",
+              "tagline": "Senior Product Manager • B2C & B2B FinTech • CS (AI/ML) @ UPenn",
+              "connected_at": "Connected on October 31, 2025"
+            },
+            {
+              "name": "Anouksha Rajesh",
+              "linkedin_url": "https://www.linkedin.com/in/anouksharajesh/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQElHh8p6sgyig/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1732541520932?e=1764104400&v=beta&t=mZDMxHSt4v33JDpogQEwFVHvgbVALU6tJs2f1RCDb50",
+              "tagline": "GHC’25 | MS in Data Science @ Columbia | DS Researcher @TD | Ex-Data Scientist @Quantifind | Looking for FT opportunities in Jan 2026 | Gen AI, Data Science, Machine Learning, Data Engineering",
+              "connected_at": "Connected on October 30, 2025"
+            },
+            {
+              "name": "Manasa Garimella, MBA",
+              "linkedin_url": "https://www.linkedin.com/in/manasa-garimella-mba/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C4D03AQHmoPyxoIuxOw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1533488581165?e=1764806400&v=beta&t=IzVs8mtWA97nDfBW6FHOuXw2481DnxjuhQdFOJTOons",
+              "tagline": "Senior Product Manager | Health Tech | B2B SaaS | Customer Service Experience | Love All Animals🐾",
+              "connected_at": "Connected on October 28, 2025"
+            },
+            {
+              "name": "Ravisha S K",
+              "linkedin_url": "https://www.linkedin.com/in/ravishask/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQGthtaLSqhy6w/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1648420167071?e=1764806400&v=beta&t=c1qspShayKgQNm4Yay6LFoFpRwaLgG7Hddze4qMqbTM",
+              "tagline": "Product @ Oracle Cloud Infrastructure | Cloud Practitioner | ex-AWS | ex-Consultant",
+              "connected_at": "Connected on October 27, 2025"
+            },
+            {
+              "name": "April Tsuei 崔采婕",
+              "linkedin_url": "https://www.linkedin.com/in/apriltsuei/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQFJlg_qRZ8-ow/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1561848492635?e=1764806400&v=beta&t=p_bqD0z8P4-1Djb6lfQQV4HrDQcj2SqepH4GoQC2ys0",
+              "tagline": "Technical Sourcer @ Snap 👻",
+              "connected_at": "Connected on October 24, 2025"
+            },
+            {
+              "name": "Josie Aguilar Pérez",
+              "linkedin_url": "https://www.linkedin.com/in/josie-aguilar-p%C3%A9rez-109356197/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQHxVQ5MxK8gYg/profile-displayphoto-shrink_100_100/B4DZZ_gUSJGgAU-/0/1745895901424?e=1764806400&v=beta&t=KMNfzjaWy8RBmloy013dNhar7am3nkZsshfBnDAaNec",
+              "tagline": "Website Development Advocate | Branding Enthusiast | Homebrewing Fan",
+              "connected_at": "Connected on October 23, 2025"
+            },
+            {
+              "name": "Bhumika Thakur",
+              "linkedin_url": "https://www.linkedin.com/in/bhumika-thakur-2416b7319/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQGh8D6HMFz7Nw/profile-displayphoto-scale_100_100/B4EZmDWhHJIMAc-/0/1758845342787?e=1764806400&v=beta&t=UKnU88F-0FW8W-rhl6ntvcQ9AWkfJIMcOAXBFGciRGY",
+              "tagline": "SWE Fellow @ Meta | CS and Math @ UW-Madison | Undergrad Researcher | GHC2025",
+              "connected_at": "Connected on October 23, 2025"
+            },
+            {
+              "name": "Rudrakshi Moudgil",
+              "linkedin_url": "https://www.linkedin.com/in/rudrakshi-moudgil/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQF_u1ByfrSAyg/profile-displayphoto-scale_100_100/B56ZlCDKwqKEAc-/0/1757749751581?e=1764806400&v=beta&t=zoXtjRqySjvfLQ25AwnLjEf72kLnF13K57qerTZAsiU",
+              "tagline": "MSIS @ UMCP | GHC’25 | Bridging Tech & Business | Business Analysis | Product Analysis | Ex-Software developer",
+              "connected_at": "Connected on October 22, 2025"
+            },
+            {
+              "name": "Roshni More",
+              "linkedin_url": "https://www.linkedin.com/in/roshni-more/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQEpjrDDhbfXmg/profile-framedphoto-shrink_100_100/B4DZkRzz45IYAk-/0/1756940418891?e=1764104400&v=beta&t=CVIjSoOSjmk9WXW-axYxsbmEvy2p2kKhAQXqxgvW8Wc",
+              "tagline": "GHC 2025 | Project Manager @ iConsult Collaborative | MS in Information Systems | Skilled in Python, Java, Power BI, Tableau, SQL, Excel & AWS — turning complex data into strategic business insights.",
+              "connected_at": "Connected on October 22, 2025"
+            },
+            {
+              "name": "Anand Wadurkar",
+              "linkedin_url": "https://www.linkedin.com/in/anand-w-27aa24110/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQGXGwwtHWeVQQ/profile-displayphoto-shrink_100_100/B4EZPSvOykHkAU-/0/1734407418540?e=1764806400&v=beta&t=JtmLwm78aavzlTBFwyM-WBFapVUrGowLnV0s9GSJnf4",
+              "tagline": "",
+              "connected_at": "Connected on October 22, 2025"
+            },
+            {
+              "name": "Sarah Thompson",
+              "linkedin_url": "https://www.linkedin.com/in/sarahe-thompson/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQGuSwOYofhrcQ/profile-displayphoto-shrink_100_100/B4EZjKAL4cGoAY-/0/1755735703849?e=1764806400&v=beta&t=rMUR-r1aW3i8j1knqDXssyLPzFU07p5WIHozti7UoEw",
+              "tagline": "Human Resources - Talent Acquisition at Prudential Financial",
+              "connected_at": "Connected on October 22, 2025"
+            },
+            {
+              "name": "Mike Andrews",
+              "linkedin_url": "https://www.linkedin.com/in/mike-j-andrews/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQGoqEmTQ6SJjA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1517367479635?e=1764806400&v=beta&t=lz5WvxKBvsHc3bod9NXm0S9kQSPYOgFbO1izL6kdmpQ",
+              "tagline": "Director of Product at Mogli Technologies",
+              "connected_at": "Connected on October 21, 2025"
+            },
+            {
+              "name": "Shubhi Gupta",
+              "linkedin_url": "https://www.linkedin.com/in/shubhigupta0406/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGppPtWgLDDrg/profile-displayphoto-scale_100_100/B56ZlZmAM9KMAc-/0/1758144759602?e=1764806400&v=beta&t=S5_nrDeCmLztM0AZNhQSaSUh1wB2byLhNqFat1O_xQ8",
+              "tagline": "MBA Student @ UCDavis| Product Manager Intern @ Rocket, Lets Pingle| Ex - InMobi, Adobe, MphRx",
+              "connected_at": "Connected on October 18, 2025"
+            },
+            {
+              "name": "Anandhi Raghuraman",
+              "linkedin_url": "https://www.linkedin.com/in/anandhi-raghuraman/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQFEX16EjVAunQ/profile-displayphoto-shrink_100_100/B4EZciStvPG4AU-/0/1748627021693?e=1764806400&v=beta&t=uUJQ40KEeEv_S6sA6PkWFcdTlwagPpEdV6oWpSdQWNc",
+              "tagline": "WE’2025 | MS in Engineering Management @ UMass | GenAI Enthusiast | Driving User-Centric, Scalable Solutions",
+              "connected_at": "Connected on October 17, 2025"
+            },
+            {
+              "name": "Rutika Bhoir",
+              "linkedin_url": "https://www.linkedin.com/in/rutikabhoir/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQH9_YaBFX4J4A/profile-displayphoto-scale_100_100/B4DZmiWQtpJgAc-/0/1759365369636?e=1764806400&v=beta&t=oGaddlA4J7sVBVWZcb7jmzu2d4kGc6VUZIT5-OuHGHQ",
+              "tagline": "M.S. Computer Science @ UMass Amherst | Software & ML Engineer | AI + Data Systems | RenderATL 2026 Ambassador | #WE25",
+              "connected_at": "Connected on October 17, 2025"
+            },
+            {
+              "name": "Aaryan Pasupuleti",
+              "linkedin_url": "https://www.linkedin.com/in/aaryan-pasupuleti/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQE_WGpSkA_DjQ/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1736562112038?e=1764104400&v=beta&t=8mbUOB1wevtelr8ZFYAQPuFsdw9sj5EW5gFn1ZWPKTc",
+              "tagline": "Actively seeking full time Software Development Engineer(SDE) roles | Masters in Computer Science student at University of Florida | Verizon | VIT ’22",
+              "connected_at": "Connected on October 17, 2025"
+            },
+            {
+              "name": "Janice Bajwa",
+              "linkedin_url": "https://www.linkedin.com/in/janice-bajwa-934285215/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFlRGfKVvA1Ww/profile-displayphoto-scale_100_100/B56ZmIiRrMJkAc-/0/1758932311407?e=1764806400&v=beta&t=hQenqwR3AKxVPN5R2lT8LgL-Ag_P6XIvpg6-1tG3nCw",
+              "tagline": "Computer Engineering @ UW Madison | WE25 | Undergraduate Researcher @ Wide Band Gap Materials and Devices Lab",
+              "connected_at": "Connected on October 17, 2025"
+            },
+            {
+              "name": "Zeeshan Munir Raja",
+              "linkedin_url": "https://www.linkedin.com/in/zeeshanmr/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQGItHeqMzNgKQ/profile-displayphoto-shrink_100_100/B4EZVwc.iBGwAU-/0/1741348400226?e=1764806400&v=beta&t=r_TRuT90d3WkCfkr1l_spUDbBl2YhioVFBwjO1O2B14",
+              "tagline": "Motion Designer for AI, SaaS, Web3 & FinTech | Explainer Videos that Help Startups Launch, Pitch & Scale",
+              "connected_at": "Connected on October 17, 2025"
+            },
+            {
+              "name": "NIKHIL T",
+              "linkedin_url": "https://www.linkedin.com/in/nikhil-t-b5638b240/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHycz1R_t_nzA/profile-displayphoto-scale_100_100/B56Zfu2JchHQAg-/0/1752058862698?e=1764806400&v=beta&t=3ZEY8KwEzMLfWnqmSOFwxrW-L4VCQmUznfSlz_KsyWU",
+              "tagline": "Business and IT Solution Consultant (Canda & USA) |  Market Analysis (International)",
+              "connected_at": "Connected on October 16, 2025"
+            },
+            {
+              "name": "Anagha Malladi",
+              "linkedin_url": "https://www.linkedin.com/in/anagha-malladi/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQHtaGXhT2BrZQ/profile-framedphoto-shrink_100_100/B4EZnOR5mCIIAo-/0/1760102423152?e=1764104400&v=beta&t=CD5UyXA0yulQaTRoWEf5H4Fos97I3OcDfBmJ40tNyz4",
+              "tagline": "Computer Science Graduate Student at California State University, Sacramento.",
+              "connected_at": "Connected on October 15, 2025"
+            },
+            {
+              "name": "Monica Rivera",
+              "linkedin_url": "https://www.linkedin.com/in/monicamrivera/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQEZG2jfDXtFRg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1685050101384?e=1764806400&v=beta&t=w2OiGNKcLw-VhPVDVt7tz1NQcCzjnYrkY-KNFNkmqTU",
+              "tagline": "💡 Personal Brand & Communication Coach🔹 Helping Leaders & Teams Master Storytelling, Presence & Authority 🔹 TEDx Speaker, NPR Fellow",
+              "connected_at": "Connected on October 15, 2025"
+            },
+            {
+              "name": "Brooke Robertson",
+              "linkedin_url": "https://www.linkedin.com/in/brookelrobertson/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQFwO3wyUDeHMQ/profile-displayphoto-scale_100_100/B4EZmbot3BKgAg-/0/1759252766599?e=1764806400&v=beta&t=jg7bPSLUihejlTZt43QoddYKK9447YVDvOo6IX5jgVA",
+              "tagline": "Senior Product Manager | Microsoft | Security",
+              "connected_at": "Connected on October 15, 2025"
+            },
+            {
+              "name": "Hasti Mehta",
+              "linkedin_url": "https://www.linkedin.com/in/hasti-mehta-090a86180/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGEYwQwS0o_Tw/profile-displayphoto-scale_100_100/B56ZmcAPNFG4Ag-/0/1759258932499?e=1764806400&v=beta&t=A_DzrmCI716Nh4h0Hx0J3wXLC1CB9hwfVLhvAVLMqQg",
+              "tagline": "GHC25 | AI & Machine Learning Engineer @ UIC AI Lab | Machine Learning | LLM | NLP | Deep Learning",
+              "connected_at": "Connected on October 15, 2025"
+            },
+            {
+              "name": "Muskaan Yadav",
+              "linkedin_url": "https://www.linkedin.com/in/muskaan-yadav/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQFKibnBdUluKQ/profile-framedphoto-shrink_100_100/B4EZjJNlcnHEAk-/0/1755722438736?e=1764104400&v=beta&t=9t4X1Tf55teR5635us3cAdSpgdmRyCKUKJ3CWTQl8Ig",
+              "tagline": "Business Analyst | Financial Planning & Analysis | Data Analytics, Process Improvement & Decision Support | SQL • Python • Tableau • Excel | MSBA, Baruch | #GHC25 ",
+              "connected_at": "Connected on October 15, 2025"
+            },
+            {
+              "name": "Christina Mingo",
+              "linkedin_url": "https://www.linkedin.com/in/christinamingo/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGnsoIYvt6S8w/profile-displayphoto-shrink_100_100/B56ZRdmP4QHQAc-/0/1736737095740?e=1764806400&v=beta&t=CL_bjoMATHGpvh3KrQjpYMhLvGq1tnPrWlRs_fIlo_E",
+              "tagline": "Senior HRBP @ Microsoft || ICF-Certified Coach || Award-winning HR Expert @ C3 Career Consulting, LLC || Speaker || Facilitator",
+              "connected_at": "Connected on October 15, 2025"
+            },
+            {
+              "name": "Mansi Sugan",
+              "linkedin_url": "https://www.linkedin.com/in/mansisugan/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEJodzDx4Ifmw/profile-displayphoto-scale_100_100/B56ZnvTfP6HAAc-/0/1760656488157?e=1764806400&v=beta&t=6KZ3jT_xMhKXUry_uSSCvrnFBNJnu9sgyA1rgIQy4yA",
+              "tagline": "AI-Native Product Designer | UX Researcher | Healthcare, B2B, SAAS & B2C |  MS HCI",
+              "connected_at": "Connected on October 14, 2025"
+            },
+            {
+              "name": "Isabel Amaya",
+              "linkedin_url": "https://www.linkedin.com/in/isabel-amaya/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQHZWHhdTkHPfg/profile-displayphoto-scale_100_100/B4EZna6rxSK0Ac-/0/1760314443303?e=1764806400&v=beta&t=Ko5JI67Ece6-5EEw4VQ_ko0er6E67NN1RZGxMIuslVI",
+              "tagline": "HR Consultant /HR Business Partner | Talent Acquisition | Career, Life & Mindset Coach | ACTION AND FLOW ",
+              "connected_at": "Connected on October 14, 2025"
+            },
+            {
+              "name": "Roxanne Burbach",
+              "linkedin_url": "https://www.linkedin.com/in/roxanneburbach/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFMcA85BL8J1A/profile-displayphoto-scale_100_100/B56ZoRSv2MJoAc-/0/1761226720683?e=1764806400&v=beta&t=KJaGicf8DFe8x9WnHZMFB6nJwIfJ2CZWiNxsONSf11Y",
+              "tagline": "Career & Leadership Coach | Employee Listening Specialist | Helping leaders and organizations operationalize their values",
+              "connected_at": "Connected on October 14, 2025"
+            },
+            {
+              "name": "Laura Pauly",
+              "linkedin_url": "https://www.linkedin.com/in/laura-pauly-03a94845/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQGngI40CzfRFg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1517411717903?e=1764806400&v=beta&t=FaRbMZBbNcGBfE8gVPIQGUcvfiSpFXuWZplMLl-V7Ig",
+              "tagline": "Recruiter, Disney Experiences - Making Disney dreams come true!",
+              "connected_at": "Connected on October 14, 2025"
+            },
+            {
+              "name": "Gilou Tenebro",
+              "linkedin_url": "https://www.linkedin.com/in/gilou/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQG_RkBrjQXNTw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1555180509339?e=1764806400&v=beta&t=ADrrNeNZZloc-B2DV7ir5FjAMQyJRhqDn4GeEDjyF1k",
+              "tagline": "Security Research and Engineering",
+              "connected_at": "Connected on October 14, 2025"
+            },
+            {
+              "name": "Dudyala Bhageeratha",
+              "linkedin_url": "https://www.linkedin.com/in/dudyala-bhageeratha/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGrnnamWK_pxA/profile-displayphoto-scale_100_100/B56Zk8qF2FHAAc-/0/1757659292242?e=1764806400&v=beta&t=W-WVPijPBCDlw5uHJ07MBhqzLXGusG3EYPwnjKzMfHU",
+              "tagline": "Supply Chain & Operational Efficiency | MS Industrial Engineering @ Texas A&M University | Data-Driven Decision Making | Lean Six Sigma Certified | Amazon | DRDO | VIT’23",
+              "connected_at": "Connected on October 14, 2025"
+            },
+            {
+              "name": "Tejas R",
+              "linkedin_url": "https://www.linkedin.com/in/tejas-r-1b5945232/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGF7BRq7e1vCg/profile-displayphoto-shrink_100_100/B56ZbExpg4GoAU-/0/1747058072260?e=1764806400&v=beta&t=vID1-npZjYCMCrJF1AxG9xbFb4Bhrk2J2rQop_HRhEY",
+              "tagline": "HPE",
+              "connected_at": "Connected on October 14, 2025"
+            },
+            {
+              "name": "Vishakha Khambhaitta",
+              "linkedin_url": "https://www.linkedin.com/in/vishakha-khambhaitta/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQEnk37fJUhnDQ/profile-framedphoto-shrink_100_100/B4DZm4I46kJQAk-/0/1759730962529?e=1764104400&v=beta&t=8SEp0BHguTN8bPVgjtgcOOL70J-XgdEqGzzObs1uiQA",
+              "tagline": "GHC25 | Software Developer @CSULB | MS CS @CSULB | Ex-SDE @InfoLabz | Passionate About Tech, Innovation & Women in Computing | Exploring AI & Cloud",
+              "connected_at": "Connected on October 14, 2025"
+            },
+            {
+              "name": "Surbhi Gupta",
+              "linkedin_url": "https://www.linkedin.com/in/surbhi-gupta-2104/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEi4EF8vdRxgg/profile-displayphoto-scale_100_100/B56ZkV6u6yHkAc-/0/1757009344073?e=1764806400&v=beta&t=H5wyG1dVQYcO1o8QK9zGntSIG7KFQGSDKMW0p9z1igM",
+              "tagline": "#GHC25 Attendee | Software Engineer 2.0 | Women in Tech | CodePath | RTC |",
+              "connected_at": "Connected on October 14, 2025"
+            },
+            {
+              "name": "Pragya Thakur",
+              "linkedin_url": "https://www.linkedin.com/in/pragya-thakur-sai/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEbx8Vc8I8sbg/profile-displayphoto-scale_100_100/B56ZhnKWhEHUAc-/0/1754077424235?e=1764806400&v=beta&t=GLLhV8AHmh2CUK2wJaCAGvWmgO2b0ER8r3OAGCo-7bg",
+              "tagline": "Senior SWE – Platform & AI Infra | Barclays | ex-Amazon | DevOps | Distributed System | 5+ years",
+              "connected_at": "Connected on October 12, 2025"
+            },
+            {
+              "name": "Manogna Vanam",
+              "linkedin_url": "https://www.linkedin.com/in/manognavanam/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQGLJUBhb42VRA/profile-framedphoto-shrink_100_100/B56ZVzJGRvHsAk-/0/1741393520234?e=1764104400&v=beta&t=TnA2InXC0w-veSQdKVky2qMIV_4iFRCHtgsp0x8g7js",
+              "tagline": "GHC 25 | WE25 | Software Engineer with 4 YOE (Barracuda Networks, TCS) | MS CS Specialized in AI/ML at SUNY Buffalo",
+              "connected_at": "Connected on October 11, 2025"
+            },
+            {
+              "name": "Brennah Chirumbole, M.A.",
+              "linkedin_url": "https://www.linkedin.com/in/brennah-chirumbole/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQF-EU9ug8xaIw/profile-displayphoto-scale_100_100/B4EZfQef8cHgAc-/0/1751549346946?e=1764806400&v=beta&t=k1HopBqkJWztcw6R35V8kzCnlfcI34D0a0PkFM4d6Gw",
+              "tagline": "Senior Communications Specialist at The Walt Disney Company",
+              "connected_at": "Connected on October 10, 2025"
+            },
+            {
+              "name": "Tushuli Patil",
+              "linkedin_url": "https://www.linkedin.com/in/tushulipatil17/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQENzeNx4nuavQ/profile-framedphoto-shrink_100_100/B4EZmMswgrIkAo-/0/1759002167792?e=1764104400&v=beta&t=8Ea3tbFPL7r-OyFfCZaaU3x0-eQrnpKVq6LQ097U-xg",
+              "tagline": "Actively Seeking Full Time Data Opportunities | GHC25 | Data @ Central | MSIM Grad @UIUC | Data Science & Analytics | Business Intelligence, Predictive Analysis, & Cloud Solutions |",
+              "connected_at": "Connected on October 9, 2025"
+            },
+            {
+              "name": "Kanchan Ashok Naik",
+              "linkedin_url": "https://www.linkedin.com/in/kanchan-ashok-naik/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQGf0vpfIiybRg/profile-framedphoto-shrink_100_100/B56ZnL.pZYKMAk-/0/1760063821817?e=1764104400&v=beta&t=mBefcRAlwZ8qYj8cMGP7n3sTPAOKTuTtqP1uXStXGxc",
+              "tagline": "#SWE25 | #GHC25 | Full-Stack & AI Engineer| 5 years exp as SDE| AI/ML intern | MS Applied Data Intelligence @ SJSU| LLMs • MLLMs • RAG • Prompt Engineering • Agentic AI | Python • PyTorch • NLP | Seeking Full -Time roles",
+              "connected_at": "Connected on October 9, 2025"
+            },
+            {
+              "name": "Sanjana Gautam, (PhD)",
+              "linkedin_url": "https://www.linkedin.com/in/sanjanagautam/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEc4qo6SZOa1w/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1688781355244?e=1764806400&v=beta&t=SDFerPTIxZ3xF3cE0TtWtyrK1qPt4SmsMIdHo9hIhP4",
+              "tagline": "Research Fellow at UT Austin",
+              "connected_at": "Connected on October 9, 2025"
+            },
+            {
+              "name": "Deepti Agrawal",
+              "linkedin_url": "https://www.linkedin.com/in/deepti-agrawal19/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQFfKEA18HF9Ng/profile-framedphoto-shrink_100_100/B4DZpXGDkoGgAk-/0/1762397796941?e=1764104400&v=beta&t=31KypKB_ufwBJQdjvM4k9vzOmAhxX7Q4FNySDKDxCE8",
+              "tagline": "Aspiring AI & Data Specialist | ASU MS DS ’26 | Research Assistant | VJTI IT ’24 | ex-Fractal | ex-AEEE | GHC25 | WE25",
+              "connected_at": "Connected on October 7, 2025"
+            },
+            {
+              "name": "Marija P.",
+              "linkedin_url": "https://www.linkedin.com/in/marija-perovic/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQFXfaj5eJpeHA/profile-displayphoto-shrink_100_100/B4DZctnpKqGUAU-/0/1748817057711?e=1764806400&v=beta&t=_-LsyypGNRGajNZsE7AABj7nOFc09yvGNfkDv3ofDN4",
+              "tagline": "Helping brands message smarter (and safer) 📲🛡️ | US & Canada | Omnichannel + Fraud Prevention",
+              "connected_at": "Connected on October 7, 2025"
+            },
+            {
+              "name": "Cristal Guadalupe Cancel",
+              "linkedin_url": "https://www.linkedin.com/in/cristal-guadalupe-cancel-4b774718a/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHZc41NxmHKbQ/profile-displayphoto-shrink_100_100/B56ZXajx.TGsAU-/0/1743128568755?e=1764806400&v=beta&t=gaSpscek7duw1fHID16xKkANAqRVipVK1c6ReXtA7mA",
+              "tagline": "Senior AI Risk & Abuse Specialist",
+              "connected_at": "Connected on October 6, 2025"
+            },
+            {
+              "name": "MaryKim Dinh",
+              "linkedin_url": "https://www.linkedin.com/in/kimmarydinh/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGOR9-8aJHXjQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1712597990187?e=1764806400&v=beta&t=ELsIOuC5DxsJ8A9as4rMIlBxe5QX9FgV-HuXj--NX2I",
+              "tagline": "Strategic Program Manager | Driving Revenue Growth through Innovative Sales Initiatives and Cross-Functional Collaboration",
+              "connected_at": "Connected on October 5, 2025"
+            },
+            {
+              "name": "Meloni Patel",
+              "linkedin_url": "https://www.linkedin.com/in/meloni-patel/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQFDVoc2HjYJtQ/profile-framedphoto-shrink_100_100/B4DZkoMu_PHwAk-/0/1757316051340?e=1764104400&v=beta&t=w1liy_d6BHS1UPcaLLl5aH9CKGY0gDglnF3CF3O-d90",
+              "tagline": "Ex-SDE Intern @Amazon | ASU MS CS’25 | Ex-Summer Analyst @Goldman Sachs ’23 | GHC25",
+              "connected_at": "Connected on October 4, 2025"
+            },
+            {
+              "name": "Adam D'Arcy 🏳️‍🌈 (he/him)",
+              "linkedin_url": "https://www.linkedin.com/in/adamedarcy/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQH55pThi6YNAg/profile-displayphoto-shrink_100_100/B4EZbDphYJHwAc-/0/1747039164721?e=1764806400&v=beta&t=yi_oDTzJLNvCarnUQcTsVDZY6guGZoi3sPirwR2pfQA",
+              "tagline": "Principal Engineer | Engineering Leader UI/UX & Security @ Workday | HCI, AI & Security expert",
+              "connected_at": "Connected on October 4, 2025"
+            },
+            {
+              "name": "VenkataGovardhanareddy Nemakal",
+              "linkedin_url": "https://www.linkedin.com/in/govardhan6765/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQETg9S5Qfd84Q/profile-framedphoto-shrink_100_100/B4EZjUlqO_GwAk-/0/1755913299120?e=1764104400&v=beta&t=5ajn6wWG2IlXT1tRpqXYm9bANzfW29FD8DYyzmGVe_o",
+              "tagline": "Senior Full Stack Developer at Evernorth Health | 11+Yrs of Experience  | ReactJs | AngularJS | Nodejs | Java 8/17/21 |Spring Boot| Microservices | REST APIs | GraphQL | Azure | AWS | Docker | Kubernetes",
+              "connected_at": "Connected on October 3, 2025"
+            },
+            {
+              "name": "Ayushi Gaur",
+              "linkedin_url": "https://www.linkedin.com/in/ayushi-gaur-32ba4811a/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQFSUC4wkSUIpg/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1694725706324?e=1764104400&v=beta&t=SkBLJzMlQi00dms4chV-j6UoXWn06gVzkBdQqnS3jLk",
+              "tagline": "Sr. Machine Learning Engineer | Generative AI & Large Language Models | AWS & Azure | NielsenIQ | Healthcare Analytics | CPG Analytics| UIC | BITS Pilani",
+              "connected_at": "Connected on October 2, 2025"
+            },
+            {
+              "name": "Palashi Singhal",
+              "linkedin_url": "https://www.linkedin.com/in/palashi/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQHVYfHkXe7BFA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1719289364413?e=1764806400&v=beta&t=vz-cdGhQg67dGQTnJA3FJkDUHZE95qtGGRAWIDD88tA",
+              "tagline": "Growth and Strategy | Blending behavioral research, experimentation and strategy to help scale businesses | Ex@ ScottsMiracleGro  | UPenn Alumi | Featured in Business Insider",
+              "connected_at": "Connected on September 26, 2025"
+            },
+            {
+              "name": "Christopher Coyle, AAMS®",
+              "linkedin_url": "https://www.linkedin.com/in/christopher-coyle-aams%C2%AE-0b147010a/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFa0N9AsUAMcA/profile-displayphoto-shrink_100_100/B56ZUquyf.GsAU-/0/1740178663728?e=1764806400&v=beta&t=H4FIsmO6gWWkl7s-vO_Qd3ExXnUqf5j-BFB5b21aE-M",
+              "tagline": "Financial Advisor/Marketing Director at Paramount Associates Wealth Management",
+              "connected_at": "Connected on September 26, 2025"
+            },
+            {
+              "name": "Souvick Das",
+              "linkedin_url": "https://www.linkedin.com/in/souvick-das-a13696210/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQGZqD9_PTnzjw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1662554925219?e=1764806400&v=beta&t=NgfoSu4dg1_zKJI5_mAd41eTr1S15E2cEsZS6BXgt1o",
+              "tagline": "Account Manager | B2B | NetCom Learning",
+              "connected_at": "Connected on September 24, 2025"
+            },
+            {
+              "name": "Harsha Vardhan",
+              "linkedin_url": "https://www.linkedin.com/in/harsha-vardhan-232007380/",
+              "profile_image": null,
+              "tagline": "Data Quality & Automation Engineer | Google Cloud Platform (GCP) | BigQuery | Python | SQL | Dataflow | Airflow | ETL/ELT Testing",
+              "connected_at": "Connected on September 24, 2025"
+            },
+            {
+              "name": "Emon Elias",
+              "linkedin_url": "https://www.linkedin.com/in/emon-elias-2a2890282/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQFIEZUWgVjAYw/profile-framedphoto-shrink_100_100/B56Zl7yaoyHAAk-/0/1758718438304?e=1764104400&v=beta&t=hDEOFEe1AOg5omTY0dGZVTDoRBFiVRelzFN-f7ROQVs",
+              "tagline": "Aspiring Data Analyst - \nMysql || MS Excel || Power Bi || Python",
+              "connected_at": "Connected on September 24, 2025"
+            },
+            {
+              "name": "Gnana Chaitanya Ummadisingu",
+              "linkedin_url": "https://www.linkedin.com/in/gnana-chaitanya/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFbliQvQRI2Ng/profile-displayphoto-scale_100_100/B56ZomXNJdIsAk-/0/1761580243529?e=1764806400&v=beta&t=BJbon53JccI4Nn1oz6620VIIDbso0LDg3YKE-81nffM",
+              "tagline": "Full Stack Developer @ Ulta Beauty | CS Masters @ Arizona State",
+              "connected_at": "Connected on September 24, 2025"
+            },
+            {
+              "name": "Mounika Reddy Anuga",
+              "linkedin_url": "https://www.linkedin.com/in/mounika-reddy-anuga-5332b4363/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQFKFj8BAoZajg/profile-framedphoto-shrink_100_100/B56Zkz8Dn8KEAo-/0/1757513049050?e=1764104400&v=beta&t=-FE55RCLC1DfTQ_8POGOKa7L1LiUnDMX6auvwM3iiag",
+              "tagline": "Graduate Student in Engineering Management | Aspiring , Admin, Supply Chain & IT Intern | Lean Six Sigma | Open to Spring & Summer 2026 Internships",
+              "connected_at": "Connected on September 24, 2025"
+            },
+            {
+              "name": "Asshwath Sai Muralidharan",
+              "linkedin_url": "https://www.linkedin.com/in/asshwath-sai-muralidharan-9579251a4/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGgxoIAw_lM7A/profile-displayphoto-scale_100_100/B56ZouHEZ_I4Ao-/0/1761710198299?e=1764806400&v=beta&t=8F_JAM257ikbv4cqHOm_GynFtTkh0EXgMWaNXNas1sA",
+              "tagline": "Aspiring AI PM| Product Space Fellowship | Data Science | Machine Learning | Generative AI",
+              "connected_at": "Connected on September 24, 2025"
+            },
+            {
+              "name": "Parth Mahajan",
+              "linkedin_url": "https://www.linkedin.com/in/parthvmahajan/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQFIW60UprqKBA/profile-framedphoto-shrink_100_100/B4EZetS6g6HcAk-/0/1750959106548?e=1764104400&v=beta&t=I-Q2HTHQuND_9QLG5-a77maZ7nNCyUkuZih5kCEp54Q",
+              "tagline": "Driving Pipeline Growth via Demand Gen, AI Enablement & Advanced Analytics",
+              "connected_at": "Connected on September 23, 2025"
+            },
+            {
+              "name": "Jaswant Tawdekar",
+              "linkedin_url": "https://www.linkedin.com/in/jaswant888/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGHPONpyYlHfg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1703820593189?e=1764806400&v=beta&t=4j6W4xLOqGJCgdC2jEuxFChaeJwPz7APE6sdIgAqzXo",
+              "tagline": "Head of Product |  AI/ML | UC Berkeley, MBA | Fintech | Cloud | Kubernetes | AIFashionWeek.ai | Plutopal.ai |",
+              "connected_at": "Connected on September 23, 2025"
+            },
+            {
+              "name": "Divya Karunanithi",
+              "linkedin_url": "https://www.linkedin.com/in/divya-karunanithi251992/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQGJuVjqbX2EDQ/profile-framedphoto-shrink_100_100/B56ZjCP5NmHkAo-/0/1755605603558?e=1764104400&v=beta&t=QhNKMgfxMV7N4DOC9GiPWbn2i_-Kr-DuyAhcdpS0c_4",
+              "tagline": "Data Analyst at Tech Mahindra(Actively looking for data analyst role)",
+              "connected_at": "Connected on September 18, 2025"
+            },
+            {
+              "name": "Sai Ram Mehantha",
+              "linkedin_url": "https://www.linkedin.com/in/sairammehantha/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQGwV9sJ52AueQ/profile-framedphoto-shrink_100_100/B4EZlYKaYjHoAk-/0/1758120748948?e=1764104400&v=beta&t=XZZFtexDND0-7zHi797fFdnEo6QbJGqG7OYY_liH9e4",
+              "tagline": "Senior Business Analyst/Product Owner At JPMC| 10+ years of Experience| PMO |Agile | Scrum |Expertise in Strategic Analysis | Actively Seeking New Contract Opportunities|",
+              "connected_at": "Connected on September 18, 2025"
+            },
+            {
+              "name": "Tharun Kumar Katabathina",
+              "linkedin_url": "https://www.linkedin.com/in/tharun312k/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQHYelAAW-D-Tw/profile-framedphoto-shrink_100_100/B56ZoYtGYAG4Ao-/0/1761351067393?e=1764104400&v=beta&t=BBBm84Ai1-LpxCbXS4gSRn46QbbaLIeyEscleZQ4MbA",
+              "tagline": "Java Full Stack Developer | MS-CS Student | Tech Enthusiast & Explorer | Student Leader: SGA Senator & Library Committee Representative | DART Staff – Office of Digital Accessibility | SRGEC Alum",
+              "connected_at": "Connected on September 18, 2025"
+            },
+            {
+              "name": "Venkata Sai Medidaraju",
+              "linkedin_url": "https://www.linkedin.com/in/venkata-sai-medidaraju/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFMRZF8hQEgsg/profile-displayphoto-scale_100_100/B56ZqTUR5EKAAc-/0/1763408158729?e=1764806400&v=beta&t=9XEETTbgNEcwNIo-a7sbu5-PCIniEsxJ3bvYCiU7IYs",
+              "tagline": "👉 AI/ML Engineer | Computer Vision · NLP · Predictive Analytics | 4 Yrs in Automotive, Industrial & Enterprise AI | Edge AI · MLOps · LLMs 🚀",
+              "connected_at": "Connected on September 18, 2025"
+            },
+            {
+              "name": "Shelley Joshi",
+              "linkedin_url": "https://www.linkedin.com/in/shelleyjoshi/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGBpILfB3nUiQ/profile-displayphoto-scale_100_100/B56Zirc3yKG0Ac-/0/1755223129664?e=1764806400&v=beta&t=m8dQKlyhBtg5lVg1ybEnuYvGrFDKJzYKCjKcs57JmKU",
+              "tagline": "Seeking Full Time Opportunities | Associate Project Manager | Business Analyst | Data Analyst | MS IT @ WPI",
+              "connected_at": "Connected on September 18, 2025"
+            },
+            {
+              "name": "Rakhi Punjabi",
+              "linkedin_url": "https://www.linkedin.com/in/rps1081998/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQG6Q1VuhjMgCQ/profile-displayphoto-scale_100_100/B4DZlkof.CJIAc-/0/1758329964671?e=1764806400&v=beta&t=YCMOf-Od3JuCb3OmWLh_yo4oBUqDZIS3XHyaNnEfnTA",
+              "tagline": "Hiring Manager @ Evo Hirez (USA • UK • Canada • Australia)",
+              "connected_at": "Connected on September 18, 2025"
+            },
+            {
+              "name": "Sri Krishna Chaitanya Chivatam",
+              "linkedin_url": "https://www.linkedin.com/in/chaitu-chivatam/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGfL5hEq-v76w/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1718749125210?e=1764806400&v=beta&t=VFnTxQFJrZp3e0BK_mdNrhreKD6n9r-6y_7-GTIFcMc",
+              "tagline": "Software Engineer Intern @ Qualitest | Graduate Student Syracuse University | Computer Science | Big Data and Spark-Scala | SQL | Python | AWS | GCP | TCS Digital",
+              "connected_at": "Connected on September 18, 2025"
+            },
+            {
+              "name": "Sai Adarsh Malla",
+              "linkedin_url": "https://www.linkedin.com/in/pydisaiadarshmalla/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQET1rXlRXHbmg/profile-framedphoto-shrink_100_100/B4DZlQnUPZJYAk-/0/1757994108208?e=1764104400&v=beta&t=KCPLXIUzyMq632yO0fRC66pWEjvRN_BXi9lkIxDZlxY",
+              "tagline": "Transforming raw data into strategic insights | Data Analyst specializing in SQL & Power BI | Experienced in full-stack data solutions across diverse industries.",
+              "connected_at": "Connected on September 16, 2025"
+            },
+            {
+              "name": "Apoorva Edla",
+              "linkedin_url": "https://www.linkedin.com/in/apoorvae/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQEDFLYZoavNtQ/profile-displayphoto-scale_100_100/B4DZqJJauBKEAc-/0/1763237539069?e=1764806400&v=beta&t=AUft-bFjYW24GdKt2GsnSJqeel_3cBPMgqW7wK9j3ws",
+              "tagline": "M.S. in Information Systems @ Syracuse University | SQL, Python, Tableau, Power BI, Excel | Data & Business Analytics | Risk and Information Security Management | Operations & Supply Chain Analytics",
+              "connected_at": "Connected on September 16, 2025"
+            },
+            {
+              "name": "Kavana Hemanth",
+              "linkedin_url": "https://www.linkedin.com/in/kavana-hemanth/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEYVsORUIVs-w/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1703891001933?e=1764806400&v=beta&t=gNz8GAEfw_Uc7ZlOioWifGPHZesRKsLJkWKdfzCcEP8",
+              "tagline": "Actively Seeking Full-Time Opportunities • Ex-MTS 3 at VMware",
+              "connected_at": "Connected on September 16, 2025"
+            },
+            {
+              "name": "Raphyel Jordan",
+              "linkedin_url": "https://www.linkedin.com/in/raphyeljordan/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C4E03AQHUbhXeAK0I5Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1662734642067?e=1764806400&v=beta&t=jXxGpcuDSNxbJ1ROeXkk83sLHFthRRndXucLYHcQqIU",
+              "tagline": "Graphic Designer & All-out Creative for 100% Marketing Success",
+              "connected_at": "Connected on September 16, 2025"
+            },
+            {
+              "name": "Delaney Clark",
+              "linkedin_url": "https://www.linkedin.com/in/delaney-clark/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQHv_KAA967ocw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1658109427914?e=1764806400&v=beta&t=-nCUTlZTeugeFw28g6ziofDhu3F9zP0DvjadlkZwCnA",
+              "tagline": "3X Salesforce Certified | Salesforce Solutions Engineer @ Mogli",
+              "connected_at": "Connected on September 16, 2025"
+            },
+            {
+              "name": "Payal Roy",
+              "linkedin_url": "https://www.linkedin.com/in/payal-roy1999/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQGOJLu41nsnFQ/profile-displayphoto-scale_100_100/B4DZmoEohgHwAc-/0/1759461412132?e=1764806400&v=beta&t=DxaTzJcxKcv5raGPAFaw7To7QCqyiuIHSqHxLCWOI50",
+              "tagline": "||PhD Candidate at University of Illinois Chicago|| MSc Physics’22|| Research Intern at ISI Kolkata||",
+              "connected_at": "Connected on September 15, 2025"
+            },
+            {
+              "name": "Sindhu Suta",
+              "linkedin_url": "https://www.linkedin.com/in/sindhusuta/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQGOMDICeqo4Rg/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1708032609901?e=1764104400&v=beta&t=h-GwOFeGJDeasA850SCobog3XZljh5OyjG8YahU9TkQ",
+              "tagline": "PhD University of Illinois, Chicago | AECOM",
+              "connected_at": "Connected on September 15, 2025"
+            },
+            {
+              "name": "Khyati Shah",
+              "linkedin_url": "https://www.linkedin.com/in/shah-khyati/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQFxhSmsoVE8pA/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1704311761285?e=1764104400&v=beta&t=JylfDsPqtpKmvlZbTEoXheIusaKcb7yD0yVgCvPZkpI",
+              "tagline": "Tableau Developer @ Office of Vice Chancellor for Research @ University of Illinois, Chicago ",
+              "connected_at": "Connected on September 14, 2025"
+            },
+            {
+              "name": "Tanay Jawle",
+              "linkedin_url": "https://www.linkedin.com/in/tanay2002/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQFs0wRfo-_0ag/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1679938879158?e=1764806400&v=beta&t=Roi2sa05huK1Mp1DUpRtEIH-phJhcqHqPkoLIoZdEDs",
+              "tagline": "Master's in Information Management Grad @ UIUC | Data Analytics, Financial Analysis",
+              "connected_at": "Connected on September 14, 2025"
+            },
+            {
+              "name": "Nonitha Vampati",
+              "linkedin_url": "https://www.linkedin.com/in/nonithav/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQEjNhF0S9ykqA/profile-framedphoto-shrink_100_100/B56ZnZ9QURHUAo-/0/1760298337846?e=1764104400&v=beta&t=JUOeXyHxOKyMRb9fosCbUJ-eTVK4GwwSPyrsDbl01ag",
+              "tagline": "Java | Python | CI/CD | Microservices | ETL | AWS, GCP, Azure | Jenkins | GitLab | Terraform | Kubernetes | Data migration | Actively looking for Full-time opportunities",
+              "connected_at": "Connected on September 13, 2025"
+            },
+            {
+              "name": "Jaswanth Karjala Eshwar",
+              "linkedin_url": "https://www.linkedin.com/in/jaswanth4545/",
+              "profile_image": null,
+              "tagline": "Product - Artificial Intelligence - Growth",
+              "connected_at": "Connected on September 11, 2025"
+            },
+            {
+              "name": "Youme Chia",
+              "linkedin_url": "https://www.linkedin.com/in/youme-chia-66ba9445/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQHxFqgGCzubVw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1647885964383?e=1764806400&v=beta&t=YOqdn6ClN6XvKRV2XuzD4tXKoyMj3EY5NCtC3u9458w",
+              "tagline": "Market Development Manager @ Lumen Technologies with expertise in Telecommunications",
+              "connected_at": "Connected on September 10, 2025"
+            },
+            {
+              "name": "Himanshu .",
+              "linkedin_url": "https://www.linkedin.com/in/himanshu-07/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEMLP5BUGpbAA/profile-displayphoto-shrink_100_100/B56ZV2UJ.SHoAU-/0/1741446751255?e=1764806400&v=beta&t=1wIOjL5ReE0RHsK6cxq5V-2IiVqYPaU_APvQBwBdLvk",
+              "tagline": "Building & Managing Product(s) | Product Owner | Product Manager | Scrum | Agile | SDLC || SIBM | UPES",
+              "connected_at": "Connected on September 9, 2025"
+            },
+            {
+              "name": "Ross Aiosa",
+              "linkedin_url": "https://www.linkedin.com/in/ross-aiosa/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQH2oTypvMJKLQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1711017718152?e=1764806400&v=beta&t=x48KdmOXvftl5fH936NPTO_kgiusKlJRPg6KZ_0EzWI",
+              "tagline": "Founder | Product Management Adviser – Empowering Product Professionals with Insights, Career Growth, and Community.  Independent Consultant for SMBs\"",
+              "connected_at": "Connected on September 9, 2025"
+            },
+            {
+              "name": "Kimberly Peña",
+              "linkedin_url": "https://www.linkedin.com/in/kimberly-pena88/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFr10mAEyiHBg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1710245031430?e=1764806400&v=beta&t=TGZx6qNMOdgc_HjRBAAapwU1OmeNi4KOzm9pMtRY7m0",
+              "tagline": "Marketing Development Representative | Virtual Training Facilitator | Client Relations & Data Accuracy | Driving Growth Through Clear Communication",
+              "connected_at": "Connected on September 9, 2025"
+            },
+            {
+              "name": "Mark S.",
+              "linkedin_url": "https://www.linkedin.com/in/mark-s-7aa6b226b/",
+              "profile_image": null,
+              "tagline": "Director of IT Infrastructure and Cloud Operations",
+              "connected_at": "Connected on September 9, 2025"
+            },
+            {
+              "name": "Haley Brown",
+              "linkedin_url": "https://www.linkedin.com/in/haleybrown333/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQF1j9Lldj0ziA/profile-displayphoto-scale_100_100/B4EZiFwNT6HIAg-/0/1754590665455?e=1764806400&v=beta&t=5te7Fgw3JE1Y60u__A2i1oYXap6FFOoZBTpHAK7Qq4s",
+              "tagline": "Redpanda: streaming data made simple — Kafka API compatible + 10X faster.",
+              "connected_at": "Connected on September 8, 2025"
+            },
+            {
+              "name": "Avneet Kaur",
+              "linkedin_url": "https://www.linkedin.com/in/avneetkaur2399/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFPxJoQauU42g/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1726040572256?e=1764806400&v=beta&t=Rd998EufnVDK5aFc09K5ERAtDEJtQmBOP1RFySKlUIE",
+              "tagline": "MS CE @George Mason University | Ex-Technical Consultant @Deloitte",
+              "connected_at": "Connected on September 8, 2025"
+            },
+            {
+              "name": "Chaitanya Khot",
+              "linkedin_url": "https://www.linkedin.com/in/mr-chaitanya-khot/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQFajGPLGOJI6Q/profile-displayphoto-scale_100_100/B4DZqCIwGIIkAc-/0/1763119925339?e=1764806400&v=beta&t=nMgZ1uX6vrGrfq3TdXVhwBZAuTgfR6CtOEm9n68pG-I",
+              "tagline": "SDE & MLOps Intern @DSPL | Building Skills in Generative AI & Prompt Engineering | Oracle Certified Gen AI Professional | Python | LLMs | ETL | Building Scalable AI Systems",
+              "connected_at": "Connected on September 7, 2025"
+            },
+            {
+              "name": "Komal Torlikonda",
+              "linkedin_url": "https://www.linkedin.com/in/komal-torlikonda/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQGp5fy-kiqmUA/profile-displayphoto-scale_100_100/B4DZn.WB9BGgAc-/0/1760908812565?e=1764806400&v=beta&t=DWTvG-g2luXkXDjehwG4ezXvjKUTvnsKRAj9Ut2G9dc",
+              "tagline": "Software Engineer | Ex-TCS (Client: National Stock Exchange )| MS CS, Syracuse University’25",
+              "connected_at": "Connected on September 5, 2025"
+            },
+            {
+              "name": "Venkatesh k",
+              "linkedin_url": "https://www.linkedin.com/in/venkateshk9/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHidi4caxfASg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1724813319910?e=1764806400&v=beta&t=5tk_wcx4jSqiX1CnYzEALCtM0uc-gcmt6i7mnKar5uE",
+              "tagline": "Certified Oracle Apex Developer | MS in Computer Science | JavaScript | Java | Oracle |SQL |GIT |Oracle Database |PL/SQL | Oracle APEX | Python",
+              "connected_at": "Connected on September 5, 2025"
+            },
+            {
+              "name": "Robert Kirk",
+              "linkedin_url": "https://www.linkedin.com/in/robert-kirk-82705275/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C4D03AQEDiyIS1cuZzg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1652220616109?e=1764806400&v=beta&t=G8cUYtoWRZm5Sjnzt7-S1L9jpFoh8rJ9CF9ZsrSLq4k",
+              "tagline": "Account Manager at Mogli Technologies",
+              "connected_at": "Connected on September 5, 2025"
+            },
+            {
+              "name": "Sri Venkata Namana",
+              "linkedin_url": "https://www.linkedin.com/in/abhisheknamana/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQE4FsxdlPldzQ/profile-displayphoto-shrink_100_100/B4EZWRQycrHcAU-/0/1741898853413?e=1764806400&v=beta&t=WH9qC3pWXJtoGFXJ6nFzqpIoMn5Cjwt1sZ6KS0ClYRs",
+              "tagline": "Research Analyst | M.S. Applied Data Science | Syracuse University",
+              "connected_at": "Connected on September 2, 2025"
+            },
+            {
+              "name": "Ankush H Prasad, MBA, MS",
+              "linkedin_url": "https://www.linkedin.com/in/ankushhprasad/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQEISK_QC-tkZA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1555271501445?e=1764806400&v=beta&t=P8Oxv_wpifF7Kx8dagEOnnNeILBbjCkjbY_klnU9q4w",
+              "tagline": "AI & Business Leader | Building Agentic Platforms, Driving Growth, and Shaping the Future of Enterprise AI",
+              "connected_at": "Connected on September 2, 2025"
+            },
+            {
+              "name": "Veerendranath Daliparthi",
+              "linkedin_url": "https://www.linkedin.com/in/veer-n-daliparthi/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFUL6FoaQQNsA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1700035856293?e=1764806400&v=beta&t=Laru0qSgyqchjp_je1Bo2AWfn1AuE318FAumXmwzNxE",
+              "tagline": "Management scientist",
+              "connected_at": "Connected on September 2, 2025"
+            },
+            {
+              "name": "utsav mutadak",
+              "linkedin_url": "https://www.linkedin.com/in/utsavmut/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQElvXRsulKB5Q/profile-framedphoto-shrink_100_100/B4EZYOkXlYHYAk-/0/1744001137324?e=1764104400&v=beta&t=KqxHSmRIwC-G1nb060HKkHkMcm6yCxTd3REAuiegy_o",
+              "tagline": "Engineering Student",
+              "connected_at": "Connected on September 1, 2025"
+            },
+            {
+              "name": "Kanchan Joshi",
+              "linkedin_url": "https://www.linkedin.com/in/kanchan101/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQHYN8c1aiZpww/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1726468957990?e=1764104400&v=beta&t=Ts8fPjpqOLeD4zUZVA8oQOxlQsRNyQkzuXW7-OTr3kg",
+              "tagline": "MS Information Systems @ UC | Data Analytics | Product Management | Ex-HSBC | Open to Full-Time Roles",
+              "connected_at": "Connected on September 1, 2025"
+            },
+            {
+              "name": "Uzma Rayeen",
+              "linkedin_url": "https://www.linkedin.com/in/uzmarayeen1234/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEaQT87htSazA/profile-displayphoto-scale_100_100/B56ZhNls3YHkAc-/0/1753648387306?e=1764806400&v=beta&t=lR3eUo8Le-UZVIR5PoJtdVvHyA6TldqV31rYhVUGoyc",
+              "tagline": "Technical recruiter @ Hidani Tech | US Staffing Expert | Bridging Talent & Opportunity | Helping Professionals Land Their Dream Jobs",
+              "connected_at": "Connected on September 1, 2025"
+            },
+            {
+              "name": "Pavan Adusumalli",
+              "linkedin_url": "https://www.linkedin.com/in/pavan-adusumalli-69413b367/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQG-3hEDxEuGiQ/profile-framedphoto-shrink_100_100/B4DZf1B3yBGQAo-/0/1752162598385?e=1764104400&v=beta&t=3VlAj9LQelaiJz-FpS180LuUd_-fVs9v4NKLbt0m0mQ",
+              "tagline": "Full-Stack Java Developer | Java, Spring Boot, React, REST APIs, SQL, Git, Docker, Cloud",
+              "connected_at": "Connected on September 1, 2025"
+            },
+            {
+              "name": "Sai Sashank Tadivaka",
+              "linkedin_url": "https://www.linkedin.com/in/saisashank-tadivaka/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFNwh9w8QN6bQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1709355645115?e=1764806400&v=beta&t=2xu48BretsI7kO5MzatsfKHHonon5VjUA7JijZya_lY",
+              "tagline": "Actively Seeking SDE/ Data Analyst/SWE/Product Manager |Data Scientist | SQL | Python| Tableau |\nPower Bi | Data Engineer | Machine Learning Engineer | Transforming Data into Insights & Enhancing Security | ASU IT Grad",
+              "connected_at": "Connected on September 1, 2025"
+            },
+            {
+              "name": "Satyam Pandey",
+              "linkedin_url": "https://www.linkedin.com/in/pandeysatyam/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQE0GPcCLqiUgg/profile-displayphoto-shrink_100_100/B4EZbk94BkGUAc-/0/1747598148282?e=1764806400&v=beta&t=ht72qIom-plhWXLFAOZeGAAlHR2IKsf03dppVjvtTvc",
+              "tagline": "Quantitative Research Analyst and Trader | Data Scientist",
+              "connected_at": "Connected on September 1, 2025"
+            },
+            {
+              "name": "Sairaj Anugu",
+              "linkedin_url": "https://www.linkedin.com/in/sairaj-reddy-anugu/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFIepEmcaLQ6Q/profile-displayphoto-shrink_100_100/B56ZY0M_OrHoAU-/0/1744632542941?e=1764806400&v=beta&t=mWpw2qzPu08vqGV_DYJwABg0AC3aj5HHLhuehqhV2TA",
+              "tagline": "IIT Guwahati 🎓",
+              "connected_at": "Connected on September 1, 2025"
+            },
+            {
+              "name": "Veeranjaneyulu Vemula",
+              "linkedin_url": "https://www.linkedin.com/in/veeranjaneyulu-vemula/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEMYm4a7JqR3Q/profile-displayphoto-scale_100_100/B56Zj8X_ShIAAc-/0/1756580805543?e=1764806400&v=beta&t=BLg4oKlRJZhnp9MEKy4tc3fEaYdCj2kHRF8aBCUmEts",
+              "tagline": "Analytic Data Engineer | Python & GenAI Developer | Azure, Databricks, LangChain, Pinecone | AI-Driven Data Automation & RAG Pipelines",
+              "connected_at": "Connected on September 1, 2025"
+            },
+            {
+              "name": "Freddy Valencia, MBA",
+              "linkedin_url": "https://www.linkedin.com/in/freddy-valencia-mba-a8353156/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQGolHujxjhrNg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1576161287512?e=1764806400&v=beta&t=xVgjvQI_keqOL1FOTbGdgKekv_EQZ8kFIvoD9D8QrbU",
+              "tagline": "Senior Account Executive at Mogli",
+              "connected_at": "Connected on August 28, 2025"
+            },
+            {
+              "name": "Tiffani Moran",
+              "linkedin_url": "https://www.linkedin.com/in/tiffani-moran-3716b175/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQE1-yf-va8N6Q/profile-framedphoto-shrink_100_100/B4EZp5Q62wIQAk-/0/1762971070144?e=1764104400&v=beta&t=WIq3DiwO6_M86gV2cj82XLVcrtsEsrn-TUJdkoq0ILg",
+              "tagline": "Talent Acquisition Partner | Driving Talent Strategy | Agency & In-House Recruiting Expertise",
+              "connected_at": "Connected on August 25, 2025"
+            },
+            {
+              "name": "Shreyas Srinivas CAPM®,CSPO ®",
+              "linkedin_url": "https://www.linkedin.com/in/shreyassrinivas99/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQFogA3YAmHN5Q/profile-framedphoto-shrink_100_100/B56ZYST3aeGUAk-/0/1744063920109?e=1764104400&v=beta&t=3r7Oic-eYFhQMyKrEYcAaxVmFA1CipeoO5dB681H8Uk",
+              "tagline": "Project & Program Management | Operations Excellence | Cross-Functional Delivery | Process Optimization | Ex-Capgemini",
+              "connected_at": "Connected on August 25, 2025"
+            },
+            {
+              "name": "Niteesh Chandra Vallabhaneni",
+              "linkedin_url": "https://www.linkedin.com/in/niteesh-chandra-vallabhaneni-b14a0820a/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEU3_YpdxZ-iQ/profile-displayphoto-scale_100_100/B56Zm6VtxAJ0Ac-/0/1759767882164?e=1764806400&v=beta&t=ZlmVcDDi9kEF5_yxJ7GLx9r_NGmwoq1yaWk24ZvTqUc",
+              "tagline": "Graduate Student MS (MIS) at NIU| Specialized in Data Analytics, ETL, SQL, and Python | Seeking Data Analytics & Business Intelligence Co-op/Full-Time Opportunities.",
+              "connected_at": "Connected on August 25, 2025"
+            },
+            {
+              "name": "Vaibhav Vesmaker",
+              "linkedin_url": "https://www.linkedin.com/in/vaibhav-vesmaker-5368841b6/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQEDDW5SE0cQgQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1727286576081?e=1764806400&v=beta&t=kIUPzGFA5Y0w4l6d-EH7y2Z1XC_6of7LFu-ipzqQC_s",
+              "tagline": "Data Science @Polestar",
+              "connected_at": "Connected on August 25, 2025"
+            },
+            {
+              "name": "Khandapu Snehith",
+              "linkedin_url": "https://www.linkedin.com/in/khandapu-snehith-275611151/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQG4V0Gzsn7T7g/profile-displayphoto-shrink_100_100/B56ZUkC2TDGQAU-/0/1740066527730?e=1764806400&v=beta&t=jqoQ85OtQnj3vaTC-O8ityDg9yZLRVIpPthcyhkJfDA",
+              "tagline": "Associate Manager - Engineering@ Lightcast India | Building robust Lightcast APIs | 20k+ Impressions | NIT Sikkim",
+              "connected_at": "Connected on August 25, 2025"
+            },
+            {
+              "name": "Manita Dadwal",
+              "linkedin_url": "https://www.linkedin.com/in/manitadadwal/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQGKlrI7mGH9pg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1516972017044?e=1764806400&v=beta&t=ebXESn5bMP4ZVsTJXVarMMychB1TSNAbfgFyVZoEusg",
+              "tagline": "Risk, Identity and Data solutions | Al & Risk Management | Scaling data-driven Risk Solutions and Operational Efficiency ",
+              "connected_at": "Connected on August 25, 2025"
+            },
+            {
+              "name": "John Rippy, CCISO",
+              "linkedin_url": "https://www.linkedin.com/in/johnrippy/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQFlglwN4-7nbw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1724468837731?e=1764806400&v=beta&t=evynS3-_ugZXGU-gLgNknrLt7pV0srOp6JVZeaBwULQ",
+              "tagline": "Chief Technology Officer @ Drive Social Media Saint Louis | Marketing & Technology | Fractional Comedian",
+              "connected_at": "Connected on August 25, 2025"
+            },
+            {
+              "name": "Amulya Dinesh",
+              "linkedin_url": "https://www.linkedin.com/in/amulya-dinesh/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFVdnNqrTiYFQ/profile-displayphoto-shrink_100_100/B56ZbuJVbxH0Ac-/0/1747752147536?e=1764806400&v=beta&t=JFeJ9P5-6yro7-9TBrcq6wzi8PiLVbNsiz3otfDFd-g",
+              "tagline": "#GHC25 | Purdue MEM ’27 | Product & Program Management | Cloud | Ex - Enphase Energy | Seeking 2026 Co-ops & Internships",
+              "connected_at": "Connected on August 24, 2025"
+            },
+            {
+              "name": "Anjali Suddireddy",
+              "linkedin_url": "https://www.linkedin.com/in/anjali244/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQEy63lgAUK0-w/profile-displayphoto-shrink_100_100/B4EZXYOtEGH0AY-/0/1743089491509?e=1764806400&v=beta&t=6wUvvIcKQhUTxM0dD-XCZpwMYDV9t-kq53dt-ZvpljA",
+              "tagline": "Salesforce and Data manager at TeenWorks | 5X Salesforce certified",
+              "connected_at": "Connected on August 23, 2025"
+            },
+            {
+              "name": "Akshitha Chittipolu",
+              "linkedin_url": "https://www.linkedin.com/in/akshithachittipolu/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQGMac8B4AM-Kw/profile-framedphoto-shrink_100_100/B56Zp422x7H8Ak-/0/1762964237731?e=1764104400&v=beta&t=e5iv__pvt_rmLwfumMup3kCND9Xb75E1MgVYpcST-6E",
+              "tagline": "Data Analyst | Business Analyst | SQL | Advanced SQL | Python | Power BI | Snowflake | NoSQL | Azure | AWS & Tableau | Delivering Actionable Insights and Scalable Analytics Solutions",
+              "connected_at": "Connected on August 22, 2025"
+            },
+            {
+              "name": "Parth Joshi",
+              "linkedin_url": "https://www.linkedin.com/in/parthpjoshi2001/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQE5wxDgYyCe_g/profile-displayphoto-shrink_100_100/B4DZZzJKVJG4AU-/0/1745688504554?e=1764806400&v=beta&t=RU308ij6k6os6awdqGtn6XpO-Xyl6y8nmBpLM6leuD8",
+              "tagline": "Full-stack Developer skilled in AWS CloudFormation and Multi-Tenant Management",
+              "connected_at": "Connected on August 22, 2025"
+            },
+            {
+              "name": "Rachana Gondi",
+              "linkedin_url": "https://www.linkedin.com/in/gondirachana/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQGWguj9ctdSng/profile-framedphoto-shrink_100_100/B4DZZ8_wHAGsAs-/0/1745853809478?e=1764104400&v=beta&t=rH7dWOYk0SFx5V3-QPPlADtipCr4e0J-ZlojWcGLPPI",
+              "tagline": "Java Full Stack Developer",
+              "connected_at": "Connected on August 20, 2025"
+            },
+            {
+              "name": "Allison Kranz",
+              "linkedin_url": "https://www.linkedin.com/in/allisonkranz/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHytD8NA0b82Q/profile-displayphoto-shrink_100_100/B56ZWTO9yCGsAU-/0/1741931929355?e=1764806400&v=beta&t=uR98s5JIEYFU6Jvjua1n2SNywEREzjb2FrnIVTlzpAQ",
+              "tagline": "The Nerdy Immigration Lawyer | I help professionals, experts, students & startups achieve their self-sponsored U.S. immigration goals | Connect with me!👋",
+              "connected_at": "Connected on August 20, 2025"
+            },
+            {
+              "name": "Ramish Fatima",
+              "linkedin_url": "https://www.linkedin.com/in/ramish-fatima/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQHkZk1t4kfoDA/profile-displayphoto-scale_100_100/B4EZlubkvkKUAc-/0/1758494346669?e=1764806400&v=beta&t=G7JiRpsueDePP42K_T2Amxo8iBejPrV6PGyggPj5XDs",
+              "tagline": "Certified Google Advanced Data Analytics Professional | Data Analyst | Business Analyst | Business Intelligence | Python, SQL, Tableau, Power BI | AI-Powered Multi-Sector Business Analytics & Data Strategy",
+              "connected_at": "Connected on August 20, 2025"
+            },
+            {
+              "name": "Kavana Chandra S",
+              "linkedin_url": "https://www.linkedin.com/in/kavana-chandra-s/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQFN0No54Dfh3A/profile-framedphoto-shrink_100_100/B4DZWK5cFQHwAk-/0/1741792068296?e=1764104400&v=beta&t=g86n6VQRVmCUiPieautmfnESytk3lbTFNK3gLiEVInM",
+              "tagline": "Actively Seeking Spring 2026 Full time and Co-op | MSIS Gard student @ Syracuse University | Ex-Software Engineer/Analyst @Capgemini",
+              "connected_at": "Connected on August 18, 2025"
+            },
+            {
+              "name": "Brittney Ellison",
+              "linkedin_url": "https://www.linkedin.com/in/brittney-ellison-2a351127b/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQHqYYg4JFe2zg/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1726607975574?e=1764104400&v=beta&t=syhWz8uU064F9LZvReotprZZfJNVI65NLHGrUlbJ0iw",
+              "tagline": "Independent Recruiter",
+              "connected_at": "Connected on August 13, 2025"
+            },
+            {
+              "name": "Joshua Seiden",
+              "linkedin_url": "https://www.linkedin.com/in/joshuap-seiden/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQG9v7lK5l8ioA/profile-displayphoto-scale_100_100/B4DZhul3mzHwAk-/0/1754202078589?e=1764806400&v=beta&t=EawN-vCusbKQbZe1Rrf_zRlG1YJmVH-z_dwu9Parl-s",
+              "tagline": "SEO & Ops Systems | Growth Execution",
+              "connected_at": "Connected on August 9, 2025"
+            },
+            {
+              "name": "Venkat Maram",
+              "linkedin_url": "https://www.linkedin.com/in/venkat-maram-22741316a/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQGIZ-YFo0FctA/profile-framedphoto-shrink_100_100/B4EZZ4lvVyHkAk-/0/1745779881582?e=1764104400&v=beta&t=Os_qgVPNdhwlU0IvmVlt_gRuHIvuNEbpEhNdAsEO9HU",
+              "tagline": "Data Scientist | Data Engineer | Data Analyst | MS Computer & Information Science @ University at Buffalo | Ex- Dentsu Inc",
+              "connected_at": "Connected on August 6, 2025"
+            },
+            {
+              "name": "Andres Betancur",
+              "linkedin_url": "https://www.linkedin.com/in/andresbetancurr/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHCu-aT2b52Dw/profile-displayphoto-shrink_100_100/B56ZXRbTH0GsAU-/0/1742975350876?e=1764806400&v=beta&t=vBbgcJd9Vtd20zW7zSE_woY4xqCkx0ehGNPhdxUnrxo",
+              "tagline": "Data Analyst | 📊 Transforming Data into Insightful Decisions | Leveraging Python, SQL & Tableau for Real-World Impact | Driving Business Growth Through Data-Driven Strategies 🚀",
+              "connected_at": "Connected on August 6, 2025"
+            },
+            {
+              "name": "Alex Hristov",
+              "linkedin_url": "https://www.linkedin.com/in/coach-alex/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQHog8OeX27pTQ/profile-displayphoto-scale_100_100/B4EZf3vyCNHIAc-/0/1752208190175?e=1764806400&v=beta&t=yzsz3OczxRpmmw4BhiA80YOcIk069jXJZiqJkfkaA0k",
+              "tagline": "I help people like you achieve personal triumph 🎉\n\nMindset & Life Changes coach |\nEx Senior Software Engineer and Engineering Lead",
+              "connected_at": "Connected on August 6, 2025"
+            },
+            {
+              "name": "JP Mayilvel",
+              "linkedin_url": "https://www.linkedin.com/in/jpvel/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQGW4uh1igSp6Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1719406050262?e=1764806400&v=beta&t=RHYTfbrcBoTf-8CqahwuOUcX1NVLYCWe7Dkn5IUUVbM",
+              "tagline": "Digital Marketing Associate @ Amazon | Automation, Data Visualization, Push Notifications",
+              "connected_at": "Connected on August 6, 2025"
+            },
+            {
+              "name": "Akshay Rajendran",
+              "linkedin_url": "https://www.linkedin.com/in/akshay-rajan/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQHG-jp8CW4K6A/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1697847624632?e=1764104400&v=beta&t=eipbKvJILO2Pj3dkQOwPOEDYn-8E6HhqoDSIGQd44q8",
+              "tagline": "Data-Driven Analyst | ML, Analytics, GCP, SQL, Data Visualization, Python, R |Passionate about helping clients analyze the best outcome from churning data |MS CS at Syracuse University | Ex - Subex",
+              "connected_at": "Connected on August 5, 2025"
+            },
+            {
+              "name": "Evan Thomas",
+              "linkedin_url": "https://www.linkedin.com/in/evandthomas/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C4E03AQEJE8zX0X0DSw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1609712477124?e=1764806400&v=beta&t=pJSslQGPYzuaWY3PjJcKKIYU_uusPNhjaZxG6vbzPdI",
+              "tagline": "Thought Leadership & Content Strategist, Marketing Lead Generator, Cat Herder, and Story Teller",
+              "connected_at": "Connected on August 5, 2025"
+            },
+            {
+              "name": "Yashas G Sreenivas CSM® CSPO®",
+              "linkedin_url": "https://www.linkedin.com/in/yashassreenivas/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQFYh8MX0NxABA/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1736997171340?e=1764104400&v=beta&t=m13ZXRtTc_DnLEbRE5V5MvW-Xdr4KJi0a6J9PnpqRnI",
+              "tagline": "Aspiring Data analyst and Project Manager| CSM® CSPO® | Business Analytics & PM @ UConn | GenAI, SQL, Excel, Jira, Tableau | Turning Data into Action & Delivering Projects with Impact.",
+              "connected_at": "Connected on August 4, 2025"
+            },
+            {
+              "name": "Pranjul Garg",
+              "linkedin_url": "https://www.linkedin.com/in/gargpranjul/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHWks-a06Xxdg/profile-displayphoto-scale_100_100/B56ZiCDo70G0Ag-/0/1754528649549?e=1764806400&v=beta&t=vvuBi4Mda4mXkMlitVkXU1JiNhLnSoZpcqASdI8qbjg",
+              "tagline": "Co-Founder @ Atriya | Product Strategy & GTM | MS Business Analytics @ BU | D2C • UX • Growth • Analytics",
+              "connected_at": "Connected on August 4, 2025"
+            },
+            {
+              "name": "Christina Scarmeas",
+              "linkedin_url": "https://www.linkedin.com/in/christinascarmeas/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQG9m3L_IeErmA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1730934554338?e=1764806400&v=beta&t=vixNBp9ewSNuW1Vk29hbDZtYqZ7xS17dUNk8yfBwGz0",
+              "tagline": "CMO | Mogli Technologies",
+              "connected_at": "Connected on August 3, 2025"
+            },
+            {
+              "name": "Rohit Agarwal",
+              "linkedin_url": "https://www.linkedin.com/in/rohit-agarwal-b34b3520/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQF62TB6dXK0gA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1592054919288?e=1764806400&v=beta&t=66E2aa9Rk_dsAytpIxQJMZMt__nfjDbDaPTtU8zoIC0",
+              "tagline": "Product Manager at Twilio | IIM | B2B | SaaS",
+              "connected_at": "Connected on August 3, 2025"
+            },
+            {
+              "name": "Nithya Shree Raman Sujatha",
+              "linkedin_url": "https://www.linkedin.com/in/nithya-shree-raman-sujatha-610663240/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQH7MBTuMEOjFw/profile-displayphoto-shrink_100_100/B56ZZwnTMdHAAU-/0/1745646074043?e=1764806400&v=beta&t=dsbVbGBFIh7eFMV0fA_ZQKi5nGMzCr-MuTNVvy8-a_c",
+              "tagline": "Ex- Intern @PSEG | Research Assistant @NJIT | Data Science | AI",
+              "connected_at": "Connected on August 3, 2025"
+            },
+            {
+              "name": "Hemanth Kammili",
+              "linkedin_url": "https://www.linkedin.com/in/hemanth-k722/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQGSJ0zVb6GNZA/profile-displayphoto-shrink_100_100/B4DZYBHGLJG8AY-/0/1743775361636?e=1764806400&v=beta&t=SfRRO_iKkf-a7rHCO9x6-ddtfvmnsaZsZnwb32KrxJo",
+              "tagline": "Azure Cloud Specialist @ Palm Beach Accountable Care Organization | Master's in Computer Science",
+              "connected_at": "Connected on August 2, 2025"
+            },
+            {
+              "name": "Harshavardhan Reddy",
+              "linkedin_url": "https://www.linkedin.com/in/aharshavardhan/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGcoM1lsToDAw/profile-displayphoto-scale_100_100/B56ZqDokaDHQAc-/0/1763145042402?e=1764806400&v=beta&t=j4GttOZTZVk1KxnXShGy6l3IlNGWc42YjwYCgRDtBmE",
+              "tagline": "Senior Frontend Developer at Lenskart.com | MIT Manipal",
+              "connected_at": "Connected on August 1, 2025"
+            },
+            {
+              "name": "Vamshi Yemula",
+              "linkedin_url": "https://www.linkedin.com/in/vamshi-yemula-23429088/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGn_D-drIqHfQ/profile-displayphoto-scale_100_100/B56Zl5uIFNHMAc-/0/1758683760504?e=1764806400&v=beta&t=I3xvYgMHR7NoJ74x3FqZcg_SwYBdoThIAaw5sCvENeo",
+              "tagline": "Senior DevOps Engineer | SRE | Kubernetes | AI Enthusiast | 11K+ Network",
+              "connected_at": "Connected on August 1, 2025"
+            },
+            {
+              "name": "Priyanka G.",
+              "linkedin_url": "https://www.linkedin.com/in/priyankaghansela/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQF7kuhvPvgUwg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1599337467829?e=1764806400&v=beta&t=xl-vQTf7QW1um62HOEfGShR4uVEwOmCh-6jtWKGKuYA",
+              "tagline": "Software Engineer | Tech Project/Program Management | Scrum Master | Business Development",
+              "connected_at": "Connected on August 1, 2025"
+            },
+            {
+              "name": "Sara McConkey",
+              "linkedin_url": "https://www.linkedin.com/in/sara-mcconkey/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQHCm1NIWAwvvA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1730146611696?e=1764806400&v=beta&t=rtUMCNLrFBYMIBAhW8tVvq_V7JVBVDvaY9xM3-mQZbQ",
+              "tagline": "Onboarding Specialist @ Mogli | Bridging Technology & People | Driving Scalable Solutions",
+              "connected_at": "Connected on August 1, 2025"
+            },
+            {
+              "name": "Dinesh Raj",
+              "linkedin_url": "https://www.linkedin.com/in/srdineshraj0811/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGavn2TBNBvDQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1713014546402?e=1764806400&v=beta&t=8qJxHBR50Wgryhp7TGyi4abIrl45ZE8yjUUvEClTw2Y",
+              "tagline": "Business Analyst|Project Management|Product Owner|Business Intelligence|Product Analyst|CSM|CSPO",
+              "connected_at": "Connected on July 31, 2025"
+            },
+            {
+              "name": "Harshit Verma",
+              "linkedin_url": "https://www.linkedin.com/in/harshit-verma-/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHloaSY301-kQ/profile-displayphoto-scale_100_100/B56ZiFn9LsHkAg-/0/1754588501258?e=1764806400&v=beta&t=9AWNJTv5tkf6R1wGEH_Zd7rc9XIzQNvYeapec7OmEcY",
+              "tagline": "Sales Consultant | Appexchange SEO Optimization | Salesforce Solutions | CTI & SMS App Sales | 360 Degree Cloud | CRM Transformation",
+              "connected_at": "Connected on July 31, 2025"
+            },
+            {
+              "name": "Anand Rajasekharan",
+              "linkedin_url": "https://www.linkedin.com/in/anandr3/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGQpAKj3FltAQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1729686738510?e=1764806400&v=beta&t=-UKDlemLOUgm1wRRp0IdgQ0ahyAax7TY_xC25ottQOU",
+              "tagline": "Data & Business Analyst | Operational Insights & Strategy | SQL, Power BI, Python, Excel | Driving Process Efficiency & Business Impact",
+              "connected_at": "Connected on July 31, 2025"
+            },
+            {
+              "name": "Cecelia Kracht",
+              "linkedin_url": "https://www.linkedin.com/in/ceceliakracht/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/C5603AQFahIr0-31mrQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1652884452818?e=1764806400&v=beta&t=l3rDHxQpvImZMK0-jV34sijQ0SPEA1QydXMAnhUebiE",
+              "tagline": "Senior Business Analyst at Housecall Pro",
+              "connected_at": "Connected on July 31, 2025"
+            },
+            {
+              "name": "Shelby Day",
+              "linkedin_url": "https://www.linkedin.com/in/shelbylaneday/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHJguCQpBFZSw/profile-displayphoto-scale_100_100/B56ZnP1gTIJsAg-/0/1760128554354?e=1764806400&v=beta&t=iVruBpnodVDcf4btEv-wv-sFfhHfYI4Fgd0cw0wvpQw",
+              "tagline": "✨ Community & Talent Champion at Meissner Corporation ✨",
+              "connected_at": "Connected on July 31, 2025"
+            },
+            {
+              "name": "Sushmitha Yarramreddy",
+              "linkedin_url": "https://www.linkedin.com/in/sushmitha-yarramreddy-8158b631a/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E35AQFi0-BDn3S_-A/profile-framedphoto-shrink_100_100/B4EZg9lwyZGUAs-/0/1753379966402?e=1764104400&v=beta&t=wWI89lriidFEhoBeFqfIz20xw1tKwT5h2-P4VbU7GhA",
+              "tagline": "Business Analyst | 3+ YOE in Pharma & Healthcare Insurance | SQL, Tableau, Power BI, UAT, ETL | Driving Data-Backed Process Improvements",
+              "connected_at": "Connected on July 30, 2025"
+            },
+            {
+              "name": "Ishmael Williams 🐋",
+              "linkedin_url": "https://www.linkedin.com/in/ishmaelpipeline/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQHF1uheK0wdeg/profile-displayphoto-scale_100_100/B4EZlPn6ErK0Ac-/0/1757977488337?e=1764806400&v=beta&t=u9p4zxU5sCCPQ6OaWyXp0wTa4M1vRs92DHAZRSmvWCU",
+              "tagline": "⚜️ Founder & CEO | The Outbound Division | 🏆 Account Executive | 💳 Fintech | GTM engineer | 💼 Private Equity | Philippians 1:21",
+              "connected_at": "Connected on July 29, 2025"
+            },
+            {
+              "name": "Maha Lakshmi. CSM®",
+              "linkedin_url": "https://www.linkedin.com/in/maha-lakshmi-csm%C2%AE-730216327/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQHIfMMTZ1BJvA/profile-displayphoto-scale_100_100/B56ZgKcMSmHQAg-/0/1752521820043?e=1764806400&v=beta&t=X4aag1zDU_DrFPdkcuK-Fienuu3Vq-c9DPPI4U8sURc",
+              "tagline": "Certified Scrum Master CSM® | Software Quality Assurance | Business Analysis | M.S. in Data Science | Driving Data-Driven Decisions with Python & SQL 🚀",
+              "connected_at": "Connected on July 29, 2025"
+            },
+            {
+              "name": "Jatin Babaria",
+              "linkedin_url": "https://www.linkedin.com/in/jatin-babaria/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQG1Uc02Hf4bgw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1697989077203?e=1764806400&v=beta&t=cYRN-KJ7v6zDk8jVz7a6GJUA6dxXUCgrUtsbNB_Nwcw",
+              "tagline": "IT Delivery Head | Enterprise System Architecture Manager | Business System Manager | Web Development, Certified, Salesforce Lightning Expert, Experienced, AWS, Office 365 | Oracle, NetSuites, Workday, Intapp",
+              "connected_at": "Connected on July 29, 2025"
+            },
+            {
+              "name": "Sally Wei",
+              "linkedin_url": "https://www.linkedin.com/in/sally-wei-a05b8678/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQGCo9vHBWC-ng/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1675206544026?e=1764806400&v=beta&t=51oN02epWISyQojEUllNpLsPcNfC26Ew15ssW_SvGUA",
+              "tagline": "Product at Heroku",
+              "connected_at": "Connected on July 28, 2025"
+            },
+            {
+              "name": "Tejas Mhetre",
+              "linkedin_url": "https://www.linkedin.com/in/tejasmhetre01/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5635AQEf8_526n0ogA/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1707324404730?e=1764104400&v=beta&t=zLNDKGhxu6xPc1hb7q8PK9s87NFRWbOwT7WB9G3eNd4",
+              "tagline": "Project Management | Analyst  | Business Analysis | Power BI | Microsoft Excel",
+              "connected_at": "Connected on July 26, 2025"
+            },
+            {
+              "name": "Samiksha Paturde, CSM® , CSPO®",
+              "linkedin_url": "https://www.linkedin.com/in/sam-paturde/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQG2gIY0fV8X3g/profile-framedphoto-shrink_100_100/profile-framedphoto-shrink_100_100/0/1735315915650?e=1764104400&v=beta&t=pbk4BwlCmZqwEjJR1A5RXUCk8dmQqCGOSRE85McZOis",
+              "tagline": "AI Product @PredictaBio Innovations | UIUC Alumni | Ex-Analyst II at DXC Technology | 3.5+ Years in Product Management and Delivery, Software Engineering & Analytics",
+              "connected_at": "Connected on July 25, 2025"
+            },
+            {
+              "name": "Viraj Patel",
+              "linkedin_url": "https://www.linkedin.com/in/virajhpatel/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQEvh8428pDP3Q/profile-displayphoto-shrink_100_100/B56ZeFuyR1HoAY-/0/1750295324199?e=1764806400&v=beta&t=ZipKdpIsC08hh_T929QeWV-zsvyfNPNtmiBF00aVjD4",
+              "tagline": "Data Analyst | M.S. in Computer Science at Syracuse University | Skilled in Python, SQL, Tableau, and Machine Learning",
+              "connected_at": "Connected on July 25, 2025"
+            },
+            {
+              "name": "Tejas Dhussa",
+              "linkedin_url": "https://www.linkedin.com/in/tejas-dhussa-35636b15b/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D03AQE851PzpCxIug/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1709300710460?e=1764806400&v=beta&t=n4WAo5-JfrvDRYnqjzk61Q0fbcImOst2qcZWM1ePETA",
+              "tagline": "Travel Entrepreneur | Curating Comfortable and Safe Travel Inventory for Family and Senior Citizens",
+              "connected_at": "Connected on July 25, 2025"
+            },
+            {
+              "name": "TJ Swanson",
+              "linkedin_url": "https://www.linkedin.com/in/tjswanson/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4E03AQH69fK9x7fVgA/profile-displayphoto-shrink_100_100/B4EZTN3qHaGYAY-/0/1738620708384?e=1764806400&v=beta&t=S-ezY0rNVm3oPSwAolNwKpoleLO1G30dvvq2zvdME4I",
+              "tagline": "Business Development @ Mogli Technologies",
+              "connected_at": "Connected on July 25, 2025"
+            },
+            {
+              "name": "Tejaswini Magaji Sreenivas",
+              "linkedin_url": "https://www.linkedin.com/in/tejaswini-magaji/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQH3Tdb5s2ljQw/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1692641618930?e=1764806400&v=beta&t=Ts04FWuBt3R6ibQWIEZFt7Xzei6MHmHYQ8Q8Gpaj9WU",
+              "tagline": "Product Manager for Walmart",
+              "connected_at": "Connected on July 25, 2025"
+            },
+            {
+              "name": "Liyon T",
+              "linkedin_url": "https://www.linkedin.com/in/liyon-t-897a76266/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D5603AQFmUQOaLm37jA/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1703942575266?e=1764806400&v=beta&t=9oC2od_5s2VyTgEg-5xklH7dUQ9yzM3bcIzxLx2-swU",
+              "tagline": "Overseas business development excutive at CG-VAK Software & Exports Ltd.",
+              "connected_at": "Connected on July 24, 2025"
+            },
+            {
+              "name": "Brinda Upendra Kumar",
+              "linkedin_url": "https://www.linkedin.com/in/brindakumar/",
+              "profile_image": "https://media.licdn.com/dms/image/v2/D4D35AQHCpCKjJSkb0Q/profile-framedphoto-shrink_100_100/B4DZmXSZmBIcAk-/0/1759179807413?e=1764104400&v=beta&t=puqpGrCu4kMfJsnDojMaNdTVbYQsNuLQG1qfZYERCE4",
+              "tagline": "Data & Marketing Analytics | Business Intelligence | Product | MS in Computer Science",
+              "connected_at": "Connected on July 23, 2025"
+            }
+          ],
+          "message": "Connections retrieved successfully",
+          "image_url": "https://app.browserflow.io/session/b79d859c9f427c5b90a74376f4d3c67d/screenshot/1763497319.png",
+          "credits_used": 200
+        }
+      }
+    ]
+  },
+  "connections": {
+    "List your linkedin connections": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "List your linkedin connections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c70e831b-80bc-4de4-bed5-a20cda29ce28",
+  "meta": {
+    "instanceId": "d3ed7806db9d1cb72dd2368c105b96812e74d9ff7ee40d7c14f51279d0df2713"
+  },
+  "id": "4Lb5CwewXTURFy6j",
+  "tags": []
+}
